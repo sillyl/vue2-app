@@ -16,7 +16,13 @@
       <el-button></el-button>
     </el-tooltip> -->
     <span style="display: none">{{ circleData.curLayerUvX }}</span>
-    <div class="circle" v-if="this.evt"></div>
+    <div class="circle" v-if="this.evt">
+      <div class="center"></div>
+      <div class="center1">
+        <i class="el-icon-caret-right"></i>
+        <i class="el-icon-caret-right"></i>
+      </div>
+    </div>
     <div class="content" v-if="isContentInfo">
       {{ circleData.curLayerUvX }}
     </div>
@@ -94,12 +100,34 @@ export default {
 
 <style type="text/css" scoped>
 .circle {
-  width: 33.6px;
-  height: 33.6px;
+  width: 60px;
+  height: 60px;
   background: #fff;
   cursor: pointer;
   border-radius: 50%;
-  border: 5px solid #dcdfe6;
+  border: 1px solid red;
+  /* border: 30px solid #dcdfe6; */
+  position: relative;
+}
+.center {
+  width: 20px;
+  height: 20px;
+  background: #409eff;
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  border-radius: 50%;
+  /* transform: translate(50%, 50%); */
+}
+.center1 {
+  width: 34px;
+  height: 34px;
+  /* background: #ff4080; */
+  position: absolute;
+  top: 20px;
+  left: 40px;
+  /* border-radius: 50%; */
+  /* transform: translate(50%, 50%); */
 }
 .circle:hover {
   color: #409eff;
