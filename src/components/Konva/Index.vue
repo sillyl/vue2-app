@@ -112,20 +112,21 @@ export default {
       };
     },
     onStageClick: function (e) {
-      console.log("click", e);
+      console.log("click", this.$refs.circleTooltipRef);
       this.evt = e.evt;
-      // this.configCircle = true;
       this.visibleCircleTooltip = true;
-      if (!this.draggableCircle) {
-        // 拖拽过的圆位置不更新
-        this.konvaConfig.configCircle.x = e.evt.layerX;
-        this.konvaConfig.configCircle.y = e.evt.layerY;
-      } else {
-        // this.konvaLayerRef.remove()
-        console.log("e", e);
-        this.konvaConfig.configCircle.x = e.evt.layerX;
-        this.konvaConfig.configCircle.y = e.evt.layerY;
-      }
+      this.$refs.circleTooltipRef.form = {
+        omega: 0,
+        nodeTarget: [],
+        nodeActions: [],
+        processTarget: [],
+        processActions: [],
+      };
+      this.$refs.circleTooltipRef.directions = {
+        cx: 60,
+        cy: 60,
+        omega: 0,
+      };
     },
     onMousemove: throttle(function (e) {
       // const layerX = e.evt.layerX
