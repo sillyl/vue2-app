@@ -39,7 +39,11 @@ export default {
   computed: {
     circleNeedData() {
       return {
-        stage: { width: 2000, height: 2000 },
+        stage: this.konvaConfig.stageSize,
+        points: this.points,
+        threshold: 0.02,
+        id: "konva-content",
+        isTouchStart: this.isTouchStart,
       };
     },
   },
@@ -48,6 +52,7 @@ export default {
       configCircle: false, // 展示圆
       draggableCircle: false, // 标识是否进行过拖拽行为
       visibleCircleTooltip: false,
+      isTouchStart: false,
       evt: null,
       konvaConfig: {
         stageSize: {
@@ -112,8 +117,26 @@ export default {
       };
     },
     onStageClick: function (e) {
-      console.log("click", this.$refs.circleTooltipRef);
+      console.log("onStageClick", e);
       this.evt = e.evt;
+      this.visibleCircleTooltip = true;
+      this.$refs.circleTooltipRef.form = {
+        omega: 0,
+        nodeTarget: [],
+        nodeActions: [],
+        processTarget: [],
+        processActions: [],
+      };
+      this.$refs.circleTooltipRef.directions = {
+        cx: 60,
+        cy: 60,
+        omega: 0,
+      };
+    },
+    onStageTouchstart: function (e) {
+      console.log("onStageTouchstart", e);
+      this.evt = e.evt;
+      this.isTouchStart = true;
       this.visibleCircleTooltip = true;
       this.$refs.circleTooltipRef.form = {
         omega: 0,

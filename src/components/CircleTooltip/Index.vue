@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="circle-actions">
     <div
       id="circle-tooltip"
       v-if="visible && !isContent"
@@ -24,7 +24,6 @@
         <div
           class="center-i"
           :style="{ transform: 'rotate(' + directions.omega + 'deg)' }"
-          @click="onCaretClick"
           @mousedown="onContentMousedown"
           @touchstart="onContentTouchstart"
           @touchmove="onContentTouchmove"
@@ -34,7 +33,11 @@
           <i class="el-icon-caret-right"></i>
         </div>
       </div>
-      <div class="content">
+      <div
+        class="content"
+        id="content"
+        :style="{ top: content.top + 'px', left: content.left + 'px' }"
+      >
         <el-form ref="form" :model="form" label-width="80px" size="small">
           <el-form-item label="航向角">
             <el-input disabled v-model="form.omega"></el-input>
@@ -70,8 +73,9 @@
     </div>
   </div>
 </template>
+
 <script lang="ts">
-import { isEqual, isEmpty } from "lodash";
+import { isEqual } from "lodash";
 import { getFθ } from "@/utils/omega.js";
 export default {
   name: "CircleTooltip",
@@ -90,18 +94,24 @@ export default {
       curLayerX: null,
       curLayerY: null,
       threshold: this.circleNeedData.threshold || 0.01, //阈值
+      parentId: this.circleNeedData.id, //必须
       //方向盘参数
       directions: {
         cx: 60,
         cy: 60,
         omega: 0,
       },
-      form: {
+      form: this.circleNeedData.form || {
         omega: 0,
         nodeTarget: [],
         nodeActions: [],
         processTarget: [],
         processActions: [],
+      },
+      // content 动态位置
+      content: {
+        top: 80,
+        left: 40,
       },
     };
   },
@@ -111,30 +121,86 @@ export default {
       this.isContent = res;
     },
   },
-  computed: {},
-  mounted() {},
   updated() {
-    if (!this.isMounseMove) {
-      if (!this.isContent) {
-        const layerY = (this.curLayerY = this.evt && this.evt.layerY);
-        const layerX = (this.curLayerX = this.evt && this.evt.layerX);
-        const Len1 = 33.6 / 2;
-        this.top = layerY - Len1;
-        this.left = layerX - Len1;
-        this.directions.cx = layerX;
-        this.directions.cy = layerY;
-        this.circleData.curLayerUvX = (
-          layerX / this.circleNeedData.stage.width
-        ).toFixed(6);
-        this.circleData.curLayerUvY = (
-          layerY / this.circleNeedData.stage.height
-        ).toFixed(6);
-      } else {
-        //确保move 圆之后 content 展示位置不偏移
-        const Len2 = 80 / 2;
-        this.top = this.curLayerY - Len2;
-        this.left = this.curLayerX - Len2;
+    if (!this.circleNeedData.isTouchStart) {
+      if (!this.isMounseMove) {
+        if (!this.isContent) {
+          const layerY = (this.curLayerY = this.evt && this.evt.layerY);
+          const layerX = (this.curLayerX = this.evt && this.evt.layerX);
+          const Len1 = 33.6 / 2;
+          this.top = layerY - Len1;
+          this.left = layerX - Len1;
+          this.directions.cx = layerX;
+          this.directions.cy = layerY;
+          this.circleData.curLayerUvX = (
+            layerX / this.circleNeedData.stage.width
+          ).toFixed(6);
+          this.circleData.curLayerUvY = (
+            layerY / this.circleNeedData.stage.height
+          ).toFixed(6);
+        } else {
+          //确保move 圆之后 content 展示位置不偏移
+          const Len2 = 80 / 2;
+          this.top = this.curLayerY - Len2;
+          this.left = this.curLayerX - Len2;
+        }
       }
+      if (this.isContent) {
+        //更新content 方位
+        const dom = document.getElementById(this.parentId);
+        const dom1 = document.getElementById("content");
+        // const xLen = Math.abs(dom.clientWidth - (this.left - dom.scrollLeft));
+        // const yLen = Math.abs(dom.clientHeight - (this.top - dom.scrollTop));
+        console.log("dom.scrollLeft", dom.scrollLeft, dom.scrollTop);
+
+        const domW = dom.clientWidth / 2;
+        const domH = dom.clientWidth / 2;
+        const newLeft = this.left - dom.scrollLeft;
+        const newTop = this.top - dom.scrollTop;
+        if (newLeft <= domW && newTop <= domH) {
+          this.content.left = 40;
+          this.content.top = 80;
+        } else if (newLeft >= domW && newTop <= domH) {
+          this.content.left = -(dom1.clientWidth - 80 / 2);
+          this.content.top = 80;
+        } else if (newLeft <= domW && newTop >= domH) {
+          this.content.left = 40;
+          this.content.top = -dom1.clientHeight;
+        } else if (newLeft >= domW && newTop >= domH) {
+          this.content.left = -(dom1.clientWidth - 80 / 2);
+          this.content.top = -dom1.clientHeight;
+        }
+
+        // const dom1W = dom1.clientWidth;
+        // const dom1H = dom1.clientHeight;
+
+        // if (this.left <= dom1W) {
+        //   this.content.left = 40;
+        //   if (yLen < dom1H) {
+        //     this.content.top = -dom1H;
+        //   } else {
+        //     this.content.top = 80;
+        //   }
+        // } else if (xLen <= dom1W) {
+        //   this.content.left = -230;
+        //   if (yLen < dom1H) {
+        //     this.content.top = -dom1H;
+        //   } else {
+        //     this.content.top = 80;
+        //   }
+        // } else if (this.left > dom1W && yLen < dom1H) {
+        //   this.content.top = -dom1H;
+        //   this.content.left = 40;
+        // } else {
+        //   this.content.top = 80;
+        //   this.content.left = 40;
+        // }
+      }
+    } else {
+      const touchedNode = this.evt && this.evt.touches[0];
+      console.log("touchedNode", touchedNode);
+      this.top = touchedNode.clientY;
+      this.left = touchedNode.clientX;
     }
   },
   methods: {
@@ -145,17 +211,15 @@ export default {
           this.evt.layerY + (el.clientY - this.evt.clientY));
         const newLayerX = (this.curLayerX =
           this.evt.layerX + (el.clientX - this.evt.clientX));
+        const stageWidth = this.circleNeedData.stage.width;
+        const stageHeight = this.circleNeedData.stage.height;
         const Len1 = 33.6 / 2;
         this.top = newLayerY - Len1;
         this.left = newLayerX - Len1;
         this.directions.cx = newLayerX;
         this.directions.cy = newLayerY;
-        this.circleData.curLayerUvX = (
-          newLayerX / this.circleNeedData.stage.width
-        ).toFixed(6);
-        this.circleData.curLayerUvY = (
-          newLayerY / this.circleNeedData.stage.height
-        ).toFixed(6);
+        this.circleData.curLayerUvX = (newLayerX / stageWidth).toFixed(6);
+        this.circleData.curLayerUvY = (newLayerY / stageHeight).toFixed(6);
       }),
         (document.onmouseup = () => {
           this.isMounseMove = false;
@@ -163,6 +227,7 @@ export default {
         });
     },
     onTouchstart: function (e) {
+      const dom = document.getElementById(this.parentId);
       console.log("onTouchstart", e, this.top, this.left);
     },
     onTouchmove: function (e) {
@@ -203,17 +268,14 @@ export default {
     onContentTouchend: function () {
       console.log("onContentTouchend");
     },
-    onCaretClick: function (e) {
-      console.log("e", e);
-    },
   },
 };
 </script>
-
 <style type="text/css" scoped>
 .el-form {
   width: 250px;
 }
+
 .circle-default {
   width: 33.6px;
   height: 33.6px;
@@ -284,5 +346,6 @@ i:nth-child(1) {
   border: 1px solid #ccc;
   padding: 10px;
   background: aliceblue;
+  position: absolute;
 }
 </style>
