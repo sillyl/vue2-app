@@ -252,8 +252,8 @@ export default {
         const endX = el.clientX;
         const endY = el.clientY;
         this.form.omega = this.directions.omega = getFθ(
-          { x: endX, y: endY },
-          { x: this.directions.cx, y: this.directions.cy }
+          { x: this.directions.cx, y: this.directions.cy },
+          { x: endX, y: endY }
         );
       };
       document.onmouseup = () => {
@@ -270,8 +270,8 @@ export default {
       const endX = e.touches[0].pageX;
       const endY = e.touches[0].pageY;
       this.form.omega = this.directions.omega = getFθ(
-        { x: endX, y: endY },
-        { x: this.directions.cx, y: this.directions.cy }
+        { x: this.directions.cx, y: this.directions.cy },
+        { x: endX, y: endY }
       );
     },
     onContentTouchend: function () {
