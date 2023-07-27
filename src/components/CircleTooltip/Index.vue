@@ -10,6 +10,7 @@
       @touchmove="onTouchmove"
       @touchend="onTouchend"
       @dblclick="ondbClick"
+      @click="onClick"
     >
       <div class="circle-default" v-if="this.evt"></div>
     </div>
@@ -77,6 +78,7 @@
 <script lang="ts">
 import { isEqual } from "lodash";
 import { getFθ } from "@/utils/omega.js";
+let clickNum = 0;
 export default {
   name: "CircleTooltip",
   props: ["visible", "evt", "circleNeedData"],
@@ -145,62 +147,52 @@ export default {
           this.left = this.curLayerX - Len2;
         }
       }
-      if (this.isContent) {
-        //更新content 方位
-        const dom = document.getElementById(this.parentId);
-        const dom1 = document.getElementById("content");
-        // const xLen = Math.abs(dom.clientWidth - (this.left - dom.scrollLeft));
-        // const yLen = Math.abs(dom.clientHeight - (this.top - dom.scrollTop));
-        console.log("dom.scrollLeft", dom.scrollLeft, dom.scrollTop);
-
-        const domW = dom.clientWidth / 2;
-        const domH = dom.clientWidth / 2;
-        const newLeft = this.left - dom.scrollLeft;
-        const newTop = this.top - dom.scrollTop;
-        if (newLeft <= domW && newTop <= domH) {
-          this.content.left = 40;
-          this.content.top = 80;
-        } else if (newLeft >= domW && newTop <= domH) {
-          this.content.left = -(dom1.clientWidth - 80 / 2);
-          this.content.top = 80;
-        } else if (newLeft <= domW && newTop >= domH) {
-          this.content.left = 40;
-          this.content.top = -dom1.clientHeight;
-        } else if (newLeft >= domW && newTop >= domH) {
-          this.content.left = -(dom1.clientWidth - 80 / 2);
-          this.content.top = -dom1.clientHeight;
-        }
-
-        // const dom1W = dom1.clientWidth;
-        // const dom1H = dom1.clientHeight;
-
-        // if (this.left <= dom1W) {
-        //   this.content.left = 40;
-        //   if (yLen < dom1H) {
-        //     this.content.top = -dom1H;
-        //   } else {
-        //     this.content.top = 80;
-        //   }
-        // } else if (xLen <= dom1W) {
-        //   this.content.left = -230;
-        //   if (yLen < dom1H) {
-        //     this.content.top = -dom1H;
-        //   } else {
-        //     this.content.top = 80;
-        //   }
-        // } else if (this.left > dom1W && yLen < dom1H) {
-        //   this.content.top = -dom1H;
-        //   this.content.left = 40;
-        // } else {
-        //   this.content.top = 80;
-        //   this.content.left = 40;
-        // }
-      }
     } else {
-      const touchedNode = this.evt && this.evt.touches[0];
-      console.log("touchedNode", touchedNode);
-      this.top = touchedNode.clientY;
-      this.left = touchedNode.clientX;
+      if (!this.isMounseMove) {
+        const touchedNode = this.evt && this.evt.touches && this.evt.touches[0];
+
+        this.directions.cx = this.evt.touches[0].pageX;
+        this.directions.cy = this.evt.touches[0].pageY;
+
+        // console.log("touchedNode", this.evt);
+        this.top =
+          ((touchedNode && touchedNode.pageY) || this.evt.pageY) - 33.6 / 2;
+        this.left =
+          ((touchedNode && touchedNode.pageX) || this.evt.pageX) - 33.6 / 2;
+      }
+    }
+    if (this.isContent) {
+      //更新content 方位
+      const dom = document.getElementById(this.parentId);
+      const dom1 = document.getElementById("content");
+      // const xLen = Math.abs(dom.clientWidth - (this.left - dom.scrollLeft));
+      // const yLen = Math.abs(dom.clientHeight - (this.top - dom.scrollTop));
+      console.log("dom.scrollLeft", dom.scrollLeft, dom.scrollTop);
+
+      const domW = dom.clientWidth / 2;
+      const domH = dom.clientHeight / 2;
+      const newLeft = this.left - dom.scrollLeft;
+      const newTop = this.top - dom.scrollTop;
+      if (newLeft <= domW && newTop <= domH) {
+        console.log("1");
+
+        this.content.left = 40;
+        this.content.top = 80;
+      } else if (newLeft >= domW && newTop <= domH) {
+        console.log("2");
+        this.content.left = -(dom1.clientWidth - 80 / 2);
+        this.content.top = 80;
+      } else if (newLeft <= domW && newTop >= domH) {
+        console.log("3");
+        this.content.left = 40;
+        this.content.top = -dom1.clientHeight;
+      } else if (newLeft >= domW && newTop >= domH) {
+        console.log("4");
+        this.content.left = -(dom1.clientWidth - 80 / 2);
+        this.content.top = -dom1.clientHeight;
+      } else {
+        console.log("5");
+      }
     }
   },
   methods: {
@@ -226,22 +218,33 @@ export default {
           document.onmousemove = null;
         });
     },
-    onTouchstart: function (e) {
-      const dom = document.getElementById(this.parentId);
-      console.log("onTouchstart", e, this.top, this.left);
-    },
+    onTouchstart: function (e) {},
     onTouchmove: function (e) {
       this.isMounseMove = true;
-      console.log("onTouchmove", e);
-
-      this.left = e.changedTouches[0].clientX;
-      this.top = e.changedTouches[0].clientY;
+      this.left = e.touches[0].pageX;
+      this.top = e.touches[0].pageY;
+      this.directions.cx = e.touches[0].pageX;
+      this.directions.cy = e.touches[0].pageY;
     },
     onTouchend: function () {
       this.isMounseMove = false;
     },
     ondbClick: function () {
+      console.log("kkk");
       this.isContent = true;
+    },
+    onClick: function () {
+      if (this.circleNeedData.isTouchStart) {
+        clickNum++;
+        setTimeout(function () {
+          clickNum = 0;
+        }, 300);
+        if (clickNum > 1) {
+          clickNum = 0;
+          this.isContent = true;
+          console.log("双击");
+        }
+      }
     },
     onContentMousedown: function () {
       document.onmousemove = (el) => {
@@ -262,8 +265,14 @@ export default {
       console.log("onContentTouchstart");
     },
 
-    onContentTouchmove: function () {
-      console.log("onContentTouchmove");
+    onContentTouchmove: function (e) {
+      console.log("onContentTouchmove", e);
+      const endX = e.touches[0].pageX;
+      const endY = e.touches[0].pageY;
+      this.form.omega = this.directions.omega = getFθ(
+        { x: endX, y: endY },
+        { x: this.directions.cx, y: this.directions.cy }
+      );
     },
     onContentTouchend: function () {
       console.log("onContentTouchend");

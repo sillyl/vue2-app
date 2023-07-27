@@ -1,13 +1,12 @@
 <template>
   <div id="konva-content">
-    hhhh
-    <i class="el-icon-edit"></i>
     <v-stage
       ref="konvaRef"
       :config="konvaConfig.stageSize"
       @click="onStageClick"
       @mousemove="onMousemove"
       @contextmenu="onContextmenu"
+      @touchstart="onStageTouchstart"
     >
       <v-layer ref="konvaLayerRef">
         <v-group
