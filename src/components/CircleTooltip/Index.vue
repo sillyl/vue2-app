@@ -39,37 +39,111 @@
         id="content"
         :style="{ top: content.top + 'px', left: content.left + 'px' }"
       >
-        <el-form ref="form" :model="form" label-width="80px" size="small">
+        <!-- <el-form
+          ref="form"
+          :model="form.selectPoint"
+          label-width="80px"
+          size="small"
+        >
           <el-form-item label="航向角">
             <el-input disabled v-model="form.omega"></el-input>
           </el-form-item>
-          <h5>节点属性</h5>
-          <el-form-item label="目标物">
-            <el-select v-model="form.nodeTarget" placeholder="请选择目标物">
-              <el-option label="区域一" value="shanghai"></el-option>
-              <el-option label="区域二" value="beijing"></el-option>
-            </el-select>
+          <el-form-item label="过程属性" prop="process">
+            <el-tooltip class="item" content="添加" placement="top">
+              <i
+                class="el-icon-circle-plus-outline"
+                @click="addProcessItem()"
+              />
+            </el-tooltip>
+            <div
+              class="form-items-label"
+              v-if="form.selectPoint.process.length > 0"
+            >
+              <span>目标物</span>
+              <span>动作</span>
+            </div>
+            <div
+              class="form-items"
+              v-for="(item, index) in form.selectPoint.process"
+              :key="index"
+            >
+              <el-row>
+                <el-col :span="9">
+                  <el-select
+                    v-model="form.selectPoint.process[index].target"
+                    placeholder="--请选择--"
+                  >
+                    <el-option
+                      v-for="item in form.identifierList"
+                      :key="item.code"
+                      :label="item.name"
+                      :value="item.code"
+                    ></el-option>
+                  </el-select>
+                </el-col>
+                <el-col :span="9">
+                  <el-select
+                    v-model="form.selectPoint.process[index].action"
+                    placeholder="--请选择--"
+                  >
+                    <el-option
+                      v-for="item in form.metaTaskList"
+                      :key="item.method"
+                      :label="item.name"
+                      :value="item.method"
+                    ></el-option>
+                  </el-select>
+                </el-col>
+                <el-col :span="2">
+                  <span @click="deleteProcessItem(index)"
+                    ><i class="el-icon-delete"
+                  /></span>
+                </el-col>
+              </el-row>
+              <hr />
+            </div>
           </el-form-item>
-          <el-form-item label="动 作">
-            <el-select v-model="form.nodeActions" placeholder="请选择动作">
-              <el-option label="区域一" value="shanghai"></el-option>
-              <el-option label="区域二" value="beijing"></el-option>
-            </el-select>
+          <el-form-item label="节点属性" prop="process">
+            <el-button @click="addStationItem()"> + </el-button>
+            <div v-for="(item, index) in form.selectPoint.station" :key="index">
+              <el-row>
+                <el-col :span="10">
+                  <el-select
+                    v-model="form.selectPoint.station[index].target"
+                    placeholder="--目标物--"
+                  >
+                    <el-option
+                      v-for="item in form.identifierList"
+                      :key="item.code"
+                      :label="item.name"
+                      :value="item.code"
+                    ></el-option>
+                  </el-select>
+                </el-col>
+                <el-col :span="10">
+                  <el-select
+                    v-model="form.selectPoint.station[index].action"
+                    placeholder="--动作--"
+                  >
+                    <el-option
+                      v-for="item in form.metaTaskList"
+                      :key="item.method"
+                      :label="item.name"
+                      :value="item.method"
+                    ></el-option>
+                  </el-select>
+                </el-col>
+                <el-col :span="2">
+                  <el-button @click="deleteStationItem(index)"> - </el-button>
+                </el-col>
+              </el-row>
+            </div>
           </el-form-item>
-          <h5>过程属性</h5>
-          <el-form-item label="目标物">
-            <el-select v-model="form.processTarget" placeholder="请选择目标物">
-              <el-option label="区域一" value="shanghai"></el-option>
-              <el-option label="区域二" value="beijing"></el-option>
-            </el-select>
+          <el-form-item>
+            <el-button @click="onCancel">删除</el-button>
+            <el-button type="primary" @click="onSubmit">保存</el-button>
           </el-form-item>
-          <el-form-item label="动 作">
-            <el-select v-model="form.processActions" placeholder="请选择动作">
-              <el-option label="区域一" value="shanghai"></el-option>
-              <el-option label="区域二" value="beijing"></el-option>
-            </el-select>
-          </el-form-item>
-        </el-form>
+        </el-form> -->
       </div>
     </div>
   </div>
@@ -105,10 +179,9 @@ export default {
       },
       form: this.circleNeedData.form || {
         omega: 0,
-        nodeTarget: [],
-        nodeActions: [],
-        processTarget: [],
-        processActions: [],
+        identifierList: [], // 目标物
+        metaTaskList: [], // 动作
+        selectPoint: [], // 选择点
       },
       // content 动态位置
       content: {
@@ -124,6 +197,10 @@ export default {
     },
   },
   updated() {
+    // console.log("k", this.circleNeedData.form);
+
+    const dom = document.getElementById(this.parentId);
+    const dom1 = document.getElementById("content");
     if (!this.circleNeedData.isTouchStart) {
       if (!this.isMounseMove) {
         if (!this.isContent) {
@@ -140,6 +217,17 @@ export default {
           this.circleData.curLayerUvY = (
             layerY / this.circleNeedData.stage.height
           ).toFixed(6);
+          console.log(
+            " this.circleNeedData.form.selectPoint",
+            this.circleNeedData.form.selectPoint
+          );
+
+          const res = this.getMinPoint(
+            this.circleNeedData.form.selectPoint,
+            { x: layerX, y: layerY },
+            200
+          );
+          console.log("res", res, { x: layerX, y: layerY });
         } else {
           //确保move 圆之后 content 展示位置不偏移
           const Len2 = 80 / 2;
@@ -150,52 +238,65 @@ export default {
     } else {
       if (!this.isMounseMove) {
         const touchedNode = this.evt && this.evt.touches && this.evt.touches[0];
-
-        this.directions.cx = this.evt.touches[0].pageX;
-        this.directions.cy = this.evt.touches[0].pageY;
-
-        // console.log("touchedNode", this.evt);
-        this.top =
-          ((touchedNode && touchedNode.pageY) || this.evt.pageY) - 33.6 / 2;
-        this.left =
-          ((touchedNode && touchedNode.pageX) || this.evt.pageX) - 33.6 / 2;
+        // touch 事件拿到的位置都是相遇于视口的，对于top 和 left 需要处理偏移量和滚动距离
+        if (!this.isContent) {
+          if (touchedNode) {
+            this.directions.cx =
+              touchedNode.pageX - dom.offsetLeft + dom.scrollLeft;
+            this.directions.cy =
+              touchedNode.pageY - dom.offsetTop + dom.scrollTop;
+            this.top = this.directions.cy - 33.6 / 2;
+            this.left = this.directions.cx - 33.6 / 2;
+            this.circleData.curLayerUvX = (
+              this.directions.cx / this.circleNeedData.stage.width
+            ).toFixed(6);
+            this.circleData.curLayerUvY = (
+              this.directions.cy / this.circleNeedData.stage.height
+            ).toFixed(6);
+          }
+        } else {
+          const Len2 = 80 / 2;
+          this.top = this.directions.cy - Len2;
+          this.left = this.directions.cx - Len2;
+        }
       }
     }
     if (this.isContent) {
       //更新content 方位
-      const dom = document.getElementById(this.parentId);
-      const dom1 = document.getElementById("content");
-      // const xLen = Math.abs(dom.clientWidth - (this.left - dom.scrollLeft));
-      // const yLen = Math.abs(dom.clientHeight - (this.top - dom.scrollTop));
-      console.log("dom.scrollLeft", dom.scrollLeft, dom.scrollTop);
-
       const domW = dom.clientWidth / 2;
       const domH = dom.clientHeight / 2;
       const newLeft = this.left - dom.scrollLeft;
       const newTop = this.top - dom.scrollTop;
       if (newLeft <= domW && newTop <= domH) {
-        console.log("1");
-
         this.content.left = 40;
         this.content.top = 80;
       } else if (newLeft >= domW && newTop <= domH) {
-        console.log("2");
         this.content.left = -(dom1.clientWidth - 80 / 2);
         this.content.top = 80;
       } else if (newLeft <= domW && newTop >= domH) {
-        console.log("3");
         this.content.left = 40;
         this.content.top = -dom1.clientHeight;
       } else if (newLeft >= domW && newTop >= domH) {
-        console.log("4");
         this.content.left = -(dom1.clientWidth - 80 / 2);
         this.content.top = -dom1.clientHeight;
-      } else {
-        console.log("5");
       }
     }
   },
+
   methods: {
+    getMinPoint: function (arr, curPoint, yuzhi) {
+      let minLen = yuzhi;
+      const { x, y } = curPoint;
+      let obj = {};
+      arr.forEach((i) => {
+        const len = Math.sqrt(Math.pow(y - i.y, 2) + Math.pow(x - i.x, 2));
+        if (len <= minLen) {
+          minLen = len;
+          obj = i;
+        }
+      });
+      return obj;
+    },
     onCircleMousedown: function () {
       (document.onmousemove = (el) => {
         this.isMounseMove = true;
@@ -218,19 +319,26 @@ export default {
           document.onmousemove = null;
         });
     },
-    onTouchstart: function (e) {},
+    onTouchstart: function () {},
     onTouchmove: function (e) {
       this.isMounseMove = true;
-      this.left = e.touches[0].pageX;
-      this.top = e.touches[0].pageY;
-      this.directions.cx = e.touches[0].pageX;
-      this.directions.cy = e.touches[0].pageY;
+      e.preventDefault();
+      const dom = document.getElementById(this.parentId);
+      this.directions.cx = e.touches[0].pageX - dom.offsetLeft + dom.scrollLeft;
+      this.directions.cy = e.touches[0].pageY - dom.offsetTop + dom.scrollTop;
+      this.top = this.directions.cy - 33.6 / 2;
+      this.left = this.directions.cx - 33.6 / 2;
+      this.circleData.curLayerUvX = (
+        this.directions.cx / this.circleNeedData.stage.width
+      ).toFixed(6);
+      this.circleData.curLayerUvY = (
+        this.directions.cy / this.circleNeedData.stage.height
+      ).toFixed(6);
     },
     onTouchend: function () {
       this.isMounseMove = false;
     },
     ondbClick: function () {
-      console.log("kkk");
       this.isContent = true;
     },
     onClick: function () {
@@ -242,7 +350,6 @@ export default {
         if (clickNum > 1) {
           clickNum = 0;
           this.isContent = true;
-          console.log("双击");
         }
       }
     },
@@ -261,12 +368,10 @@ export default {
         document.onmousemove = null;
       };
     },
-    onContentTouchstart: function () {
-      console.log("onContentTouchstart");
-    },
+    onContentTouchstart: function () {},
 
     onContentTouchmove: function (e) {
-      console.log("onContentTouchmove", e);
+      e.preventDefault();
       const endX = e.touches[0].pageX;
       const endY = e.touches[0].pageY;
       this.form.omega = this.directions.omega = getFθ(
@@ -274,15 +379,83 @@ export default {
         { x: endX, y: endY }
       );
     },
-    onContentTouchend: function () {
-      console.log("onContentTouchend");
+    onContentTouchend: function () {},
+    onCancel() {
+      // 重置form 内容
+      this.isContent = false;
+      this.form = this.circleNeedData.form || {
+        omega: 0,
+        identifierList: [], // 目标物
+        metaTaskList: [], // 动作
+        selectPoint: { location: { omega: 0 }, process: [], station: [] }, // 选择点
+      };
+    },
+    onSubmit() {
+      console.log("submit!", this.form);
+    },
+
+    // 操作form 函数
+    addProcessItem: function () {
+      this.form.selectPoint.process.push({ target: "", action: "" });
+    },
+    deleteProcessItem: function (index) {
+      this.form.selectPoint.process.splice(index, 1);
+    },
+    addStationItem: function () {
+      this.form.selectPoint.station.push({ target: "", action: "" });
+    },
+    deleteStationItem: function (index) {
+      this.form.selectPoint.station.splice(index, 1);
     },
   },
 };
 </script>
-<style type="text/css" scoped>
+
+<style lang="scss" scoped>
 .el-form {
   width: 250px;
+
+  .el-form-item {
+    margin-bottom: 10px;
+  }
+
+  .form-items {
+    margin-left: -70px;
+
+    .el-row:nth-child(1) {
+      margin-top: 4px;
+    }
+
+    .el-col {
+      margin-right: 8px;
+    }
+
+    .el-col:nth-child(1) {
+      margin-right: 13px;
+    }
+    hr {
+      margin-left: -8px;
+      color: #f5f7fa;
+    }
+  }
+  .form-items-label {
+    margin-left: -80px;
+    background: #fdf5e6;
+    color: #606266;
+
+    span {
+      display: inline-block;
+      width: 37.5%;
+    }
+
+    span:nth-child(1) {
+      margin-left: 13px;
+    }
+
+    span:nth-child(2) {
+      margin-left: 8px;
+    }
+  }
 }
 
 .circle-default {

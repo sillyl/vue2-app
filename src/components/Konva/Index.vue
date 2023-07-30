@@ -43,6 +43,83 @@ export default {
         threshold: 0.02,
         id: "konva-content",
         isTouchStart: this.isTouchStart,
+        form: {
+          omega: 0,
+          identifierList: [
+            {
+              id: "1",
+              name: "苹果",
+              code: "1",
+              createTime: 1673592152182,
+            },
+            {
+              id: "2",
+              name: "手雷",
+              code: "2",
+              createTime: 1673592152182,
+            },
+            {
+              id: "3",
+              name: "猫",
+              code: "3",
+              createTime: 1673592152182,
+            },
+            {
+              id: "4",
+              name: "人",
+              code: "4",
+              createTime: 1673592152182,
+            },
+          ], // 目标物
+          metaTaskList: [
+            {
+              id: "8ad8e8f485a9dd980185a9dda0710004",
+              name: "编队",
+              describe: "",
+              method: "TASK_TEAM",
+              params: null,
+              type: 2,
+              createTime: 1673592152177,
+            },
+            {
+              id: "8ad8e8f485a9dd980185a9dda0720005",
+              name: "围捕",
+              describe: "",
+              method: "TASK_ROUNDUP",
+              params: null,
+              type: 2,
+              createTime: 1673592152178,
+            },
+            {
+              id: "8ad8e8f485a9dd980185a9dda0740007",
+              name: "抓取",
+              describe: "",
+              method: "TASK_GRAB",
+              params: null,
+              type: 2,
+              createTime: 1673592152180,
+            },
+            {
+              id: "8ad8e8f485a9dd980185a9dda0750008",
+              name: "建图",
+              describe: "",
+              method: "TASK_MAPPING",
+              params: null,
+              type: 2,
+              createTime: 1673592152181,
+            },
+            {
+              id: "2",
+              name: "目标跟踪",
+              describe: "",
+              method: "TASK_TRACKING",
+              params: null,
+              type: 2,
+              createTime: 1673592152182,
+            },
+          ], // 动作
+          selectPoint: [{ x: 275, y: 265 }], // 选择点
+        },
       };
     },
   },
@@ -116,15 +193,14 @@ export default {
       };
     },
     onStageClick: function (e) {
-      console.log("onStageClick", e);
+      // console.log('onStageClick', e);
       this.evt = e.evt;
       this.visibleCircleTooltip = true;
       this.$refs.circleTooltipRef.form = {
         omega: 0,
-        nodeTarget: [],
-        nodeActions: [],
-        processTarget: [],
-        processActions: [],
+        identifierList: this.identifierList, // 目标物
+        metaTaskList: this.metaTaskList, // 动作
+        selectPoint: this.selectPoint, // 选择点
       };
       this.$refs.circleTooltipRef.directions = {
         cx: 60,
@@ -133,16 +209,15 @@ export default {
       };
     },
     onStageTouchstart: function (e) {
-      console.log("onStageTouchstart", e);
-      this.evt = e.evt;
+      // console.log('onStageTouchstart',e);
+      this.evt = e.evt || e;
       this.isTouchStart = true;
       this.visibleCircleTooltip = true;
       this.$refs.circleTooltipRef.form = {
         omega: 0,
-        nodeTarget: [],
-        nodeActions: [],
-        processTarget: [],
-        processActions: [],
+        identifierList: this.identifierList, // 目标物
+        metaTaskList: this.metaTaskList, // 动作
+        selectPoint: this.selectPoint, // 选择点
       };
       this.$refs.circleTooltipRef.directions = {
         cx: 60,
