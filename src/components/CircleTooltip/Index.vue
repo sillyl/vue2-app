@@ -287,12 +287,14 @@ export default {
         { x: this.circleData.curLayerUvX, y: this.circleData.curLayerUvY },
         this.threshold
       );
+      console.log("this.circleNeedData.points", this.circleNeedData.points);
       if (!isEmpty(res)) {
         if (!this.isContentMounseMove) {
           this.directions.omega = this.form.omega =
-            res.location && res.location.omega;
-          this.form.process = res.process;
-          this.form.station = res.station;
+            res.value.location && res.value.location.omega;
+          this.form.process = res.value.process;
+          this.form.station = res.value.station;
+          console.log("directionshhhhhhh", this);
         }
       }
     }
@@ -323,9 +325,9 @@ export default {
           }
         });
         if (!isEmpty(obj)) {
-          console.log("this.form.omega", this.directions.omega);
+          console.log("this.form.omega", this.form.omega);
 
-          obj["omega"] = this.directions.omega;
+          obj["omega"] = this.form.omega;
         }
       } else {
         arr.forEach((val, key) => {
@@ -446,6 +448,7 @@ export default {
         process: this.form.selectPoint.process,
         station: this.form.selectPoint.station,
       };
+      console.log("hahahaha", this.form);
       const curLen = this.circleNeedData.points.size;
 
       const obj = this.getMinPoint(

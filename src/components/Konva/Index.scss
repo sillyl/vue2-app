@@ -4,3 +4,48 @@
   position: relative;
   overflow: auto;
 }
+
+#pgmContainer {
+  position: relative;
+}
+
+#pgmLayer {
+  position: absolute;
+  width: 400px;
+  height: 300px;
+  z-index: 1000;
+  display: none;
+  background: rgba(255, 255, 255, 0.5);
+  border: 2px solid greenyellow;
+  border-radius: 4px;
+}
+
+.text {
+  font-size: 14px;
+  color: blue;
+}
+
+.item {
+  margin-bottom: 16px;
+}
+
+.clearfix {
+  font-size: 18px;
+  color: blue;
+}
+
+.clearfix:before,
+.clearfix:after {
+  display: table;
+  content: "";
+}
+
+.clearfix:after {
+  clear: both;
+}
+
+.box-card {
+  width: 396px;
+  height: 296px;
+  background: rgba(255, 255, 255, 0.6);
+}
