@@ -215,6 +215,7 @@ export default {
     triggerPosition: function (newVal, oldVal) {
       const res = isEqual(newVal, oldVal);
       this.isContent = res;
+      console.log("this.isContent", this.isContent);
     },
   },
   mounted() {
@@ -282,7 +283,6 @@ export default {
           const Len2 = 80 / 2;
           this.contentTop = this.directions.cy - Len2;
           this.contentLeft = this.directions.cx - Len2;
-          console.log("hhh", this.contentTop, this.contentLeft);
         }
       }
     }

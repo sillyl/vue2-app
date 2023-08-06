@@ -1,5 +1,5 @@
 <template>
-  <div style="background: #f6f6f6">
+  <div style="background: '000">
     <div
       id="pgmContainer"
       :style="{ height: tableHeight + 'px' }"
@@ -14,6 +14,7 @@
         @contextmenu="onContextmenu"
         @click="onStageClick"
         @touchstart="onStageTouchstart"
+        @touchmove="onStageTouchmove"
       >
         <v-layer ref="konvaLayer">
           <v-group :config="konvaConfig.group">
@@ -28,55 +29,6 @@
               @mouseup="onMouseUpForArrow"
               @touchend="onTouchEndForArrow"
             />
-          </v-group>
-          <v-group :config="konvaConfig.group">
-            <v-circle
-              v-for="(item, index) in konvaConfig.curPoint"
-              :key="index + 3000"
-              :config="{
-                x: item.x,
-                y: item.y,
-                radius: 8,
-                fill: '#ffff00',
-                stroke: 'black',
-                strokeWidth: 3,
-              }"
-            >
-            </v-circle>
-            <v-arrow
-              v-for="(item, index) in konvaConfig.curPoint"
-              :key="index + 2000"
-              :config="{
-                x: item.x,
-                y: item.y,
-                points: [
-                  0,
-                  0,
-                  50 * Math.cos((item.omega * Math.PI) / 180),
-                  50 * Math.sin((item.omega * Math.PI) / 180),
-                ],
-                pointerLength: 30,
-                pointerWidth: 10,
-                fill: '#ffff00',
-                stroke: 'black',
-                strokeWidth: 3,
-              }"
-            >
-            </v-arrow>
-          </v-group>
-          <v-group :config="konvaConfig.group">
-            <v-line
-              v-for="(item, index) in konvaConfig.polyline"
-              :key="index + 1000"
-              :config="{
-                points: item,
-                stroke: '#ff0000',
-                strokeWidth: 6,
-                lineCap: 'round',
-                lineJoin: 'round',
-              }"
-            >
-            </v-line>
           </v-group>
           <v-group
             :config="konvaConfig.group"
@@ -380,9 +332,16 @@ import {
 } from "@/api/index.js";
 import { MapImage } from "@/utils/maping.js";
 import { getCurrentTime } from "@/utils/index.js";
-import { getMinPoint } from "@/utils/CoordinatePickupFun.js";
+import {
+  getMinPoint,
+  getCenter,
+  getDistance,
+} from "@/utils/CoordinatePickupFun.js";
 import { isEmpty } from "lodash";
-
+let clickNum = 0;
+let lastCenter;
+let lastDist;
+let timeId;
 export default {
   name: "investigate",
   components: {
@@ -568,6 +527,8 @@ export default {
       this.konvaConfig.points = curPoints;
     },
     onStageClick: function (e) {
+      console.log("onStageClick");
+
       const { layerX, layerY, clientX, clientY } = e.evt;
       this.triggerPosition = {
         layerX,
@@ -578,13 +539,77 @@ export default {
       this.initData();
     },
     onStageTouchstart: function (e) {
+      const len = e.evt.touches.length;
       const { pageX, pageY } = e.evt.touches[0];
-      this.triggerPosition = {
-        pageX,
-        pageY,
-      };
-      this.isTouchStart = true;
-      this.initData();
+      console.log("onStageTouchstart", pageX, pageY, pageX > 0);
+      if (len >= 2) {
+        console.log("hhhh");
+        clearTimeout(timeId);
+      } else {
+        console.log(".....");
+        timeId = setTimeout(() => {
+          this.triggerPosition = {
+            pageX,
+            pageY,
+          };
+          this.isTouchStart = true;
+          this.initData();
+        }, 50);
+      }
+    },
+    onStageTouchmove: function (e) {
+      const touch1 = e.evt.touches[0];
+      const touch2 = e.evt.touches[1];
+      if (touch1 && touch2) {
+        // this.isTouchStart = false;
+        const stage = this.$refs.konvaStage.getStage();
+        if (stage.isDragging()) {
+          stage.stopDrag();
+        }
+        const p1 = {
+          x: touch1.clientX,
+          y: touch1.clientY,
+        };
+        const p2 = {
+          x: touch2.clientX,
+          y: touch2.clientY,
+        };
+        if (!lastCenter) {
+          lastCenter = getCenter(p1, p2);
+          return;
+        }
+
+        const newCenter = getCenter(p1, p2);
+        const dist = getDistance(p1, p2);
+        if (!lastDist) {
+          lastDist = dist;
+        }
+        const { pageX, pageY } = this.triggerPosition;
+        const pointTo = {
+          x: (newCenter.x - pageX) / this.konvaConfig.group.scaleX,
+          y: (newCenter.y - pageY) / this.konvaConfig.group.scaleY,
+        };
+        const scale = this.konvaConfig.group.scaleX * (dist / lastDist);
+        console.log("scale", scale);
+
+        this.konvaConfig.group.scaleX = scale;
+        this.konvaConfig.group.scaleY = scale;
+        const dx = newCenter.x - lastCenter.x;
+        const dy = newCenter.y - lastCenter.y;
+
+        const newPos = {
+          x: newCenter.x - pointTo.x * scale + dx,
+          y: newCenter.y - pointTo.y * scale + dy,
+        };
+        this.triggerPosition = {
+          pageX: newPos.x,
+          pageY: newPos.y,
+        };
+        // stage.position(newPos);
+        lastDist = dist;
+        lastCenter = newCenter;
+        // this.konvaConfig.
+      }
     },
     initData: function () {
       this.visibleCircleTooltip = true;
@@ -737,22 +762,12 @@ export default {
         }
       }
     },
-    onMouseLeftClick: function (click) {
-      console.log("onMouseLeftClick", click);
-      this.visibleCircleTooltip = true;
-      const { x, y } = click.position;
-      this.triggerPosition = {
-        layerX: x,
-        layerY: y,
-        clientX: 0,
-        clientY: 0,
-      };
-      this.initData();
-    },
     onContextmenu: function (click) {
       click.evt.preventDefault();
     },
     onMouseClick: function (click) {
+      console.log("onMouseClick");
+
       if (click.evt.button == 0) {
         if (!this.pointSelect) {
           this.hidePgmLayer();
@@ -782,6 +797,8 @@ export default {
       }
     },
     onTouchTap: function (click) {
+      console.log("onTouchTap");
+
       if (!this.pointSelect) {
         let id = click.target.attrs.id;
         if (typeof id != "undefined") {
@@ -795,19 +812,9 @@ export default {
 
           let x = click.evt.changedTouches[0].clientX;
           let y = click.evt.changedTouches[0].clientY;
-          this.showPgmLayer({ x, y });
+          // this.showPgmLayer({ x, y });
         } else {
           this.hidePgmLayer();
-        }
-      }
-    },
-    onMouseDown: function (click) {
-      if (this.showModel == "tileMap") {
-        if (!this.pointSelect) {
-          let pick = window.viewer.scene.pick(click.position);
-          if (pick && pick.id.name == "navigationPoint") {
-            this.selectMoveEntity = pick.id;
-          }
         }
       }
     },
@@ -905,13 +912,20 @@ export default {
       }
     },
     onTouchStartForArrow: function (click) {
+      console.log("onTouchStartForArrow");
+
       if (this.showModel === "pgmMap") {
         if (typeof click.target.attrs.id != "undefined") {
           this.selectArrowId = click.target.attrs.id;
           this.selectArrowX = click.evt.touches[0].clientX;
           this.selectArrowY = click.evt.touches[0].clientY;
+          console.log("onTouchStartForArrow1");
         } else {
+          console.log("onTouchStartForArrow2");
+
           if (this.pointSelect) {
+            console.log("onTouchStartForArrow3");
+
             let layerX =
               click.evt.touches[0].clientX +
               click.evt.layerX -
@@ -942,6 +956,8 @@ export default {
           }
 
           if (click.evt.touches.length >= 2) {
+            console.log("onTouchStartForArrow4");
+
             let p1x = click.evt.touches[0].clientX;
             let p1y = click.evt.touches[0].clientY;
             let p2x = click.evt.touches[1].clientX;
@@ -954,6 +970,8 @@ export default {
             this.konvaScrollStartX = -1;
             this.konvaScrollStartY = -1;
           } else if (click.evt.touches.length == 1) {
+            console.log("onTouchStartForArrow5");
+
             this.konvaScrollStartX = click.evt.touches[0].clientX;
             this.konvaScrollStartY = click.evt.touches[0].clientY;
           }
@@ -1133,11 +1151,7 @@ export default {
         (this.task.params.point = []),
           (this.$refs.btn1.$el.innerText = "保存导航点");
 
-        if (this.showModel == "tileMap") {
-          this.selectMoveEntity = null;
-          this.polylineEntity = null;
-          window.viewer.entities.removeAll();
-        } else if (this.showModel === "pgmMap") {
+        if (this.showModel === "pgmMap") {
           this.konvaConfig.points = [];
           this.konvaConfig.polyline = [];
         }
@@ -1263,9 +1277,6 @@ export default {
         let locations = travelObj["location"];
         for (var i = 0; i < locations.length; i++) {
           let location = locations[i];
-
-          //console.log(location);
-
           if (this.showModel === "pgmMap") {
             location.x = Math.abs(location.x);
             location.y = Math.abs(location.y);
