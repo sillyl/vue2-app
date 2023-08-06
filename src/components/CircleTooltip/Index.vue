@@ -4,7 +4,7 @@
       id="circle-tooltip"
       v-if="visible && !isContent"
       class="circle-tooltip"
-      :style="{ top: top + 'px', left: left + 'px' }"
+      :style="{ top: top + 'px', left: left + 'px', 'z-index': 1 }"
       @mousedown="onCircleMousedown"
       @touchstart="onTouchstart"
       @touchmove="onTouchmove"
@@ -12,41 +12,31 @@
       @dblclick="ondbClick"
       @click="onClick"
     >
-      <div class="circle-default" v-if="this.evt"></div>
+      <div class="circle-default" v-if="triggerPosition"></div>
     </div>
     <div
       id="circle-tooltip-content"
       class="circle-tooltip"
       v-if="isContent"
-      :style="{ top: top + 'px', left: left + 'px' }"
+      :style="{
+        top: contentTop + 'px',
+        left: contentLeft + 'px',
+        'z-index': 1,
+      }"
     >
-      <div class="circle" v-if="this.evt">
-        <div class="center"></div>
-        <div
-          class="center-i"
-          :style="{ transform: 'rotate(' + directions.omega + 'deg)' }"
-          @mousedown="onContentMousedown"
-          @touchstart="onContentTouchstart"
-          @touchmove="onContentTouchmove"
-          @touchend="onContentTouchend"
-        >
-          <i class="el-icon-caret-right"></i>
-          <i class="el-icon-caret-right"></i>
-        </div>
-      </div>
       <div
         class="content"
         id="content"
         :style="{ top: content.top + 'px', left: content.left + 'px' }"
       >
         <el-form
-          ref="form"
+          ref="formRef"
           :model="form.selectPoint"
           label-width="80px"
           size="small"
         >
           <el-form-item label="航向角">
-            <el-input disabled v-model="form.omega"></el-input>
+            <el-input v-model="form.omega"></el-input>
           </el-form-item>
           <el-form-item label="过程属性" prop="process">
             <span class="action-add">
@@ -160,20 +150,37 @@
           </el-form-item>
         </el-form>
       </div>
+      <div class="circle" v-if="triggerPosition">
+        <div class="center"></div>
+        <div
+          class="center-i"
+          :style="{ transform: 'rotate(' + directions.omega + 'deg)' }"
+          @mousedown="onContentMousedown"
+          @touchstart="onContentTouchstart"
+          @touchmove.stop="onContentTouchmove"
+          @touchend="onContentTouchend"
+        >
+          <i class="el-icon-caret-right"></i>
+          <i class="el-icon-caret-right"></i>
+        </div>
+      </div>
     </div>
   </div>
 </template>
+
 <script lang="ts">
 import { isEqual, isEmpty } from "lodash";
-import { getFθ } from "@/utils/omega.js";
+import { getFθ, getMinPoint } from "@/utils/CoordinatePickupFun.js";
 let clickNum = 0;
 export default {
-  name: "CircleTooltip",
-  props: ["visible", "evt", "circleNeedData"],
+  name: "CoordinatePickup",
+  props: ["visible", "triggerPosition", "circleNeedData"],
   data() {
     return {
       top: 60,
       left: 60,
+      contentTop: 60,
+      contentLeft: 60,
       isMounseMove: false,
       isContentMounseMove: false,
       isContent: false, // 判断展示方向和内容区
@@ -199,16 +206,22 @@ export default {
       },
       // content 动态位置
       content: {
-        top: 80,
+        top: 50,
         left: 40,
       },
     };
   },
   watch: {
-    evt: function (newVal, oldVal) {
+    triggerPosition: function (newVal, oldVal) {
       const res = isEqual(newVal, oldVal);
       this.isContent = res;
     },
+  },
+  mounted() {
+    // 确保父元素样式
+    const dom = document.getElementById(this.parentId);
+    dom.style.position = "relative";
+    dom.style.overflow = "auto";
   },
   updated() {
     const dom = document.getElementById(this.parentId);
@@ -216,11 +229,13 @@ export default {
     if (!this.circleNeedData.isTouchStart) {
       if (!this.isMounseMove) {
         if (!this.isContent) {
-          const layerY = (this.curLayerY = this.evt && this.evt.layerY);
-          const layerX = (this.curLayerX = this.evt && this.evt.layerX);
+          const layerY = (this.curLayerY = this.triggerPosition.layerY);
+          const layerX = (this.curLayerX = this.triggerPosition.layerX);
           const Len1 = 33.6 / 2;
           this.top = layerY - Len1;
           this.left = layerX - Len1;
+          this.contentTop = this.top;
+          this.contentLeft = this.left;
           this.directions.cx = layerX;
           this.directions.cy = layerY;
           this.circleData.curLayerUvX = (
@@ -232,22 +247,30 @@ export default {
         } else {
           //确保move 圆之后 content 展示位置不偏移
           const Len2 = 80 / 2;
-          this.top = this.curLayerY - Len2;
-          this.left = this.curLayerX - Len2;
+          this.contentTop = this.curLayerY - Len2;
+          this.contentLeft = this.curLayerX - Len2;
+          // this.directions.cx = this.curLayerX;
+          // this.directions.cy = this.curLayerY;
+          // this.circleData.curLayerUvX = (
+          //   this.curLayerX / this.circleNeedData.stage.width
+          // ).toFixed(6);
+          // this.circleData.curLayerUvY = (
+          //   this.curLayerY / this.circleNeedData.stage.height
+          // ).toFixed(6);
         }
       }
     } else {
       if (!this.isMounseMove) {
-        const touchedNode = this.evt && this.evt.touches && this.evt.touches[0];
+        const { pageX, pageY } = this.triggerPosition;
         // touch 事件拿到的位置都是相遇于视口的，对于top 和 left 需要处理偏移量和滚动距离
         if (!this.isContent) {
-          if (touchedNode) {
-            this.directions.cx =
-              touchedNode.pageX - dom.offsetLeft + dom.scrollLeft;
-            this.directions.cy =
-              touchedNode.pageY - dom.offsetTop + dom.scrollTop;
+          if (pageX) {
+            this.directions.cx = pageX - dom.offsetLeft + dom.scrollLeft;
+            this.directions.cy = pageY - dom.offsetTop + dom.scrollTop;
             this.top = this.directions.cy - 33.6 / 2;
             this.left = this.directions.cx - 33.6 / 2;
+            this.contentTop = this.top;
+            this.contentLeft = this.left;
             this.circleData.curLayerUvX = (
               this.directions.cx / this.circleNeedData.stage.width
             ).toFixed(6);
@@ -257,8 +280,9 @@ export default {
           }
         } else {
           const Len2 = 80 / 2;
-          this.top = this.directions.cy - Len2;
-          this.left = this.directions.cx - Len2;
+          this.contentTop = this.directions.cy - Len2;
+          this.contentLeft = this.directions.cx - Len2;
+          console.log("hhh", this.contentTop, this.contentLeft);
         }
       }
     }
@@ -270,93 +294,42 @@ export default {
       const newTop = this.top - dom.scrollTop;
       if (newLeft <= domW && newTop <= domH) {
         this.content.left = 40;
-        this.content.top = 80;
+        this.content.top = 50;
       } else if (newLeft >= domW && newTop <= domH) {
         this.content.left = -(dom1.clientWidth - 80 / 2);
-        this.content.top = 80;
+        this.content.top = 50;
       } else if (newLeft <= domW && newTop >= domH) {
         this.content.left = 40;
-        this.content.top = -dom1.clientHeight;
+        this.content.top = -dom1.clientHeight + 30;
       } else if (newLeft >= domW && newTop >= domH) {
         this.content.left = -(dom1.clientWidth - 80 / 2);
-        this.content.top = -dom1.clientHeight;
-      }
-      // 点击已存在坐标显示已存在坐标相关数据
-      const res = this.getMinPoint(
-        this.circleNeedData.points,
-        { x: this.circleData.curLayerUvX, y: this.circleData.curLayerUvY },
-        this.threshold
-      );
-      console.log("this.circleNeedData.points", this.circleNeedData.points);
-      if (!isEmpty(res)) {
-        if (!this.isContentMounseMove) {
-          this.directions.omega = this.form.omega =
-            res.value.location && res.value.location.omega;
-          this.form.process = res.value.process;
-          this.form.station = res.value.station;
-          console.log("directionshhhhhhh", this);
-        }
+        this.content.top = -dom1.clientHeight + 30;
       }
     }
   },
   methods: {
-    initFormData: function () {
-      this.form = this.circleNeedData.form || {
-        omega: 0,
-        identifierList: [], // 目标物
-        metaTaskList: [], // 动作
-        selectPoint: { location: { omega: 0 }, process: [], station: [] }, // 选择点
-      };
-    },
-    getMinPoint: function (arr, curPoint, threshold, isStage) {
-      let minLen = threshold;
-      const { x, y } = curPoint;
-      let obj = {};
-      if (isStage) {
-        arr.forEach((i) => {
-          const curPointX = i.x;
-          const curPointY = i.y;
-          const len = Math.sqrt(
-            Math.pow(y - curPointY, 2) + Math.pow(x - curPointX, 2)
-          );
-          if (len <= minLen) {
-            minLen = len;
-            obj = i;
-          }
-        });
-        if (!isEmpty(obj)) {
-          console.log("this.form.omega", this.form.omega);
-
-          obj["omega"] = this.form.omega;
-        }
-      } else {
-        arr.forEach((val, key) => {
-          const curPointX = val.location.x;
-          const curPointY = val.location.y;
-          const len = Math.sqrt(
-            Math.pow(y - curPointY, 2) + Math.pow(x - curPointX, 2)
-          );
-          if (len <= minLen) {
-            minLen = len;
-            obj = { value: val, key, curPoint };
-          }
-        });
-      }
-
-      return obj;
-    },
     onCircleMousedown: function () {
+      // 点击已存在坐标显示已存在坐标相关数据
+      const res = getMinPoint(
+        this.circleNeedData.points,
+        { x: this.circleData.curLayerUvX, y: this.circleData.curLayerUvY },
+        this.threshold
+      );
+      this.updateFormData(res);
       (document.onmousemove = (el) => {
         this.isMounseMove = true;
+        const { layerX, layerY, clientX, clientY } = this.triggerPosition;
         const newLayerY = (this.curLayerY =
-          this.evt.layerY + (el.clientY - this.evt.clientY));
+          layerY + (el.clientY - (clientY || 0)));
         const newLayerX = (this.curLayerX =
-          this.evt.layerX + (el.clientX - this.evt.clientX));
+          layerX + (el.clientX - (clientX || 0)));
         const stageWidth = this.circleNeedData.stage.width;
         const stageHeight = this.circleNeedData.stage.height;
         const Len1 = 33.6 / 2;
         this.top = newLayerY - Len1;
         this.left = newLayerX - Len1;
+        this.contentTop = this.top;
+        this.contentLeft = this.left;
         this.directions.cx = newLayerX;
         this.directions.cy = newLayerY;
         this.circleData.curLayerUvX = (newLayerX / stageWidth).toFixed(6);
@@ -367,7 +340,14 @@ export default {
           document.onmousemove = null;
         });
     },
-    onTouchstart: function () {},
+    onTouchstart: function () {
+      // 点击已存在坐标显示已存在坐标相关数据
+      const res = getMinPoint(this.circleNeedData.points, {
+        x: this.circleData.curLayerUvX,
+        y: this.circleData.curLayerUvY,
+      });
+      this.updateFormData(res);
+    },
     onTouchmove: function (e) {
       this.isMounseMove = true;
       e.preventDefault();
@@ -376,6 +356,8 @@ export default {
       this.directions.cy = e.touches[0].pageY - dom.offsetTop + dom.scrollTop;
       this.top = this.directions.cy - 33.6 / 2;
       this.left = this.directions.cx - 33.6 / 2;
+      this.contentTop = this.top;
+      this.contentLeft = this.left;
       this.circleData.curLayerUvX = (
         this.directions.cx / this.circleNeedData.stage.width
       ).toFixed(6);
@@ -429,13 +411,27 @@ export default {
     },
     onContentTouchend: function () {},
     onDelete() {
-      // 重置form 内容
+      // 重置form内容
       this.isContent = false;
       this.form.selectPoint = {
         location: { omega: 0 },
         process: [],
         station: [],
       };
+      const point = {
+        location: {
+          omega: this.form.omega,
+          x: this.circleData.curLayerUvX,
+          y: this.circleData.curLayerUvY,
+        },
+        process: this.form.selectPoint.process,
+        station: this.form.selectPoint.station,
+      };
+      this.$emit("deleteCircleTooltipData", {
+        triggerPoint: point,
+        directions: this.directions,
+        visible: false,
+      });
     },
     onSubmit() {
       // 传递父组件需要数据
@@ -448,52 +444,11 @@ export default {
         process: this.form.selectPoint.process,
         station: this.form.selectPoint.station,
       };
-      console.log("hahahaha", this.form);
-      const curLen = this.circleNeedData.points.size;
 
-      const obj = this.getMinPoint(
-        this.circleNeedData.points,
-        { x: this.circleData.curLayerUvX, y: this.circleData.curLayerUvY },
-        this.threshold
-      );
-      const stageThreshold = this.threshold * this.circleNeedData.stage.width;
-      const obj1 = this.getMinPoint(
-        this.circleNeedData.konvaConfigPoints,
-        { x: this.directions.cx, y: this.directions.cy },
-        stageThreshold,
-        true
-      );
-      let map = [];
-      if (!isEmpty(obj)) {
-        console.log("obj", obj.value, point);
-        point.location.x = obj.value.location.x;
-        point.location.y = obj.value.location.y;
-        point.location.omega = this.form.omega;
-        map = this.circleNeedData.points.set(obj.key, point);
-      } else {
-        map = this.circleNeedData.points.set(curLen, point);
-      }
-      console.log(
-        obj1,
-        "this.circleNeedData.konvaConfigPoints",
-        this.circleNeedData.konvaConfigPoints
-      );
-
-      if (!isEmpty(obj1)) {
-        console.log("xuyao更新角度");
-      } else {
-        // eslint-disable-next-line vue/no-mutating-props
-        this.circleNeedData.konvaConfigPoints.push({
-          x: this.directions.cx,
-          y: this.directions.cy,
-          omega: this.form.omega,
-        });
-      }
-      this.$emit("circleTooltipData", {
-        newPoints: map,
-        newkonvaConfigPoints: [
-          ...new Set(this.circleNeedData.konvaConfigPoints),
-        ],
+      this.$emit("saveCircleTooltipData", {
+        triggerPoint: point,
+        directions: this.directions,
+        visible: false,
       });
       this.isContent = false;
     },
@@ -511,6 +466,39 @@ export default {
     deleteStationItem: function (index) {
       this.form.selectPoint.station.splice(index, 1);
     },
+    updateFormData: function (res) {
+      // 点击和触屏时更新导航点数据
+      if (!isEmpty(res)) {
+        if (!this.isContentMounseMove) {
+          const location = res.value && res.value.location;
+          const process = res.value && res.value.process;
+          const station = res.value && res.value.station;
+          if (!isEmpty(location)) {
+            this.directions.omega = location.omega;
+            this.form = {
+              ...this.circleNeedData.form,
+              omega: location.omega,
+              selectPoint: {
+                location: { omega: location.omega },
+                process,
+                station,
+              },
+            };
+          }
+        }
+      } else {
+        this.directions.omega = 0;
+        this.form = {
+          ...this.circleNeedData.form,
+          selectPoint: { location: { omega: 0 }, process: [], station: [] },
+        };
+      }
+    },
+  },
+  destroyed() {
+    this.isMounseMove = false;
+    this.isContentMounseMove = false;
+    this.isContent = false;
   },
 };
 </script>
@@ -520,10 +508,14 @@ export default {
 
   .el-form-item {
     margin-bottom: 10px;
+
+    .el-input {
+      width: 89%;
+    }
   }
 
   .form-items {
-    margin-left: -70px;
+    margin-left: -80px;
 
     .el-row:nth-child(1) {
       margin-top: 4px;
@@ -536,11 +528,19 @@ export default {
     .el-col:nth-child(1) {
       margin-right: 13px;
     }
+
     hr {
-      margin-left: -8px;
-      color: #f5f7fa;
+      height: 0.1px;
+      border: none;
+      background-color: #d5e0f1;
     }
   }
+
+  .action-add,
+  .el-icon-delete {
+    color: blue;
+  }
+
   .form-items-label {
     margin-left: -80px;
     background: #fdf5e6;
@@ -549,13 +549,6 @@ export default {
     span {
       display: inline-block;
       width: 37.5%;
-    }
-
-    span:nth-child(1) {
-      margin-left: 13px;
-    }
-
-    span:nth-child(2) {
       margin-left: 8px;
     }
   }
@@ -632,5 +625,7 @@ i:nth-child(1) {
   padding: 10px;
   background: aliceblue;
   position: absolute;
+  max-height: 420px;
+  overflow: auto;
 }
 </style>

@@ -136,13 +136,14 @@
       </v-stage>
       <CircleTooltip
         :visible="visibleCircleTooltip"
-        :evt="evt"
+        :triggerPosition="triggerPosition"
         :circleNeedData="circleNeedData"
         ref="circleTooltipRef"
-        @circleTooltipData="circleTooltipData"
+        @saveCircleTooltipData="saveCircleTooltipData"
+        @deleteCircleTooltipData="deleteCircleTooltipData"
       />
       <div id="pgmLayer">
-        <el-card class="box-card" style="width: 396px; height: 296px">
+        <!-- <el-card class="box-card" style="width: 396px; height: 296px">
           <div slot="header" class="clearfix">
             <span>导航路径属性配置</span>
           </div>
@@ -234,7 +235,7 @@
               </el-form-item>
             </el-form>
           </div>
-        </el-card>
+        </el-card> -->
       </div>
     </div>
 
@@ -362,7 +363,7 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
 import CircleTooltip from "../CircleTooltip/Index.vue";
 import {
   getMapAllList,
@@ -379,6 +380,8 @@ import {
 } from "@/api/index.js";
 import { MapImage } from "@/utils/maping.js";
 import { getCurrentTime } from "@/utils/index.js";
+import { getMinPoint } from "@/utils/CoordinatePickupFun.js";
+import { isEmpty } from "lodash";
 
 export default {
   name: "investigate",
@@ -388,7 +391,8 @@ export default {
   data() {
     return {
       visibleCircleTooltip: false,
-      evt: null,
+      triggerPosition: null,
+      threshold: 0.01,
       isTouchStart: false,
       tableHeight: 0,
       dialogVisible: false,
@@ -403,7 +407,7 @@ export default {
       deviceList: [],
       task: {
         id: "",
-        name: "导航任务" + getCurrentTime(),
+        name: "导航任务",
         describe: "",
         method: "TASK_NAVIGATION",
         params: {
@@ -453,6 +457,8 @@ export default {
       travelUrl: "url",
       konvaScrollStartX: -1,
       konvaScrollStartY: -1,
+      navigationPoint: null,
+      curClickPointCartesian: null,
     };
   },
   computed: {
@@ -460,10 +466,8 @@ export default {
       return {
         stage: this.konvaConfig.stage,
         points: this.points,
-        threshold: 0.02,
+        threshold: this.threshold,
         id: "pgmContainer",
-        konvaConfigPoints: this.konvaConfig.points,
-        konvaConfigPolyline: this.konvaConfig.polyline,
         isTouchStart: this.isTouchStart,
         form: {
           omega: 0,
@@ -475,17 +479,110 @@ export default {
     },
   },
   methods: {
-    circleTooltipData: function (data) {
-      this.konvaConfig.points = data.newkonvaConfigPoints;
-      this.points = data.newPoints;
-      this.konvaConfig.polyline = data.newkonvaConPolyline;
+    deleteCircleTooltipData: function (data) {
+      const { directions, triggerPoint, visible } = data;
+      const {
+        location: { x, y },
+      } = triggerPoint;
+      const { cx, cy } = directions;
+      this.visibleCircleTooltip = visible;
+      const obj = getMinPoint(this.points, { x, y }, this.threshold);
+      const stageThreshold = this.threshold * this.konvaConfig.stage.width;
+      const obj1 = getMinPoint(
+        this.konvaConfig.points,
+        { x: cx, y: cy },
+        stageThreshold,
+        true
+      );
+      if (!isEmpty(obj1) || !isEmpty(obj1)) {
+        this.points.delete(obj.key);
+        let newPolyline = [];
+        this.konvaConfig.points = this.konvaConfig.points.map((i) => {
+          if (i.x === obj1.x) {
+            return;
+          } else {
+            return { ...i };
+          }
+        });
+        // 更新 polyline
+        newPolyline = this.konvaConfig.polyline.map((arrItem) => {
+          const result = [];
+          for (var i = 0; i < arrItem.length; i = i + 2) {
+            if (obj1.x == arrItem[i] && obj1.y == arrItem[i + 1]) {
+              continue;
+            } else {
+              result.push(arrItem[i]);
+              result.push(arrItem[i + 1]);
+            }
+          }
+          return result;
+        });
+        this.konvaConfig.points = [
+          ...new Set(this.konvaConfig.points.filter(Boolean)),
+        ];
+        this.konvaConfig.polyline = newPolyline;
+      }
+    },
+    saveCircleTooltipData: function (data) {
+      const { directions, triggerPoint, visible } = data;
+      const {
+        location: { x, y, omega },
+      } = triggerPoint;
+      const { cx, cy } = directions;
+      this.visibleCircleTooltip = visible;
+      const curLen = this.points.size;
+      const obj = getMinPoint(this.points, { x, y }, this.threshold);
+      const stageThreshold = this.threshold * this.konvaConfig.stage.width;
+      const obj1 = getMinPoint(
+        this.konvaConfig.points,
+        { x: cx, y: cy },
+        stageThreshold
+      );
+      let map = new Map();
+      if (!isEmpty(obj)) {
+        map = this.points.set(obj.key, triggerPoint);
+      } else {
+        map = this.points.set(curLen, triggerPoint);
+      }
+      if (!isEmpty(obj1)) {
+        this.konvaConfig.points = this.konvaConfig.points.map((i) => {
+          if (i.x === obj1.x) {
+            return { ...i, omega };
+          } else {
+            return { ...i };
+          }
+        });
+      } else {
+        this.konvaConfig.points.push({ x: cx, y: cy, omega });
+      }
+
+      this.points = map;
+      let pointArr = [];
+      const curPoints = [...new Set(this.konvaConfig.points.filter(Boolean))];
+      for (let i = 0; i < curPoints.length; i++) {
+        pointArr.splice(pointArr.length, 0, curPoints[i].x, curPoints[i].y);
+      }
+      if (pointArr.length >= 4) {
+        this.konvaConfig.polyline.push(pointArr);
+      }
+      this.konvaConfig.points = curPoints;
     },
     onStageClick: function (e) {
-      this.evt = e.evt;
+      const { layerX, layerY, clientX, clientY } = e.evt;
+      this.triggerPosition = {
+        layerX,
+        layerY,
+        clientX,
+        clientY,
+      };
       this.initData();
     },
     onStageTouchstart: function (e) {
-      this.evt = e.evt;
+      const { pageX, pageY } = e.evt.touches[0];
+      this.triggerPosition = {
+        pageX,
+        pageY,
+      };
       this.isTouchStart = true;
       this.initData();
     },
@@ -495,7 +592,7 @@ export default {
         omega: 0,
         identifierList: this.identifierList, // 目标物
         metaTaskList: this.metaTaskList, // 动作
-        selectPoint: this.selectPoint, // 选择点
+        selectPoint: this.selectPoint || this.navigationPoint, // 选择点
       };
       this.$refs.circleTooltipRef.directions = {
         cx: 60,
@@ -503,7 +600,6 @@ export default {
         omega: 0,
       };
     },
-
     async handleMetaTaskQuery() {
       let response = await getScenceMetaTaskList(2);
       if (response != null) {
@@ -589,7 +685,7 @@ export default {
         }
       }
     },
-    ////////////地图切换函数
+    // 地图切换函数
     async onSelectChange() {
       this.konvaConfig.pgmImage = null;
       this.konvaConfig.points = [];
@@ -607,8 +703,9 @@ export default {
           break;
         }
       }
-      if (mapInfo) {
+      if (mapInfo != null) {
         this.showModel === "pgmMap";
+        this.showContainer();
         let pgmImageData = await viewMap(this.scence.mapId);
         let img = new MapImage(pgmImageData);
         let canvasImg = img.getInitMap("canvas");
@@ -640,16 +737,17 @@ export default {
         }
       }
     },
-    onDragStart: function (click) {
-      if (this.showModel === "pgmMap") {
-        if (typeof click.target.attrs.id != "undefined") {
-          this.selectPoint2Id = click.target.attrs.id;
-          if (click.evt.type == "touchmove") {
-            this.selectPoint2X = click.evt.touches[0].clientX;
-            this.selectPoint2Y = click.evt.touches[0].clientY;
-          }
-        }
-      }
+    onMouseLeftClick: function (click) {
+      console.log("onMouseLeftClick", click);
+      this.visibleCircleTooltip = true;
+      const { x, y } = click.position;
+      this.triggerPosition = {
+        layerX: x,
+        layerY: y,
+        clientX: 0,
+        clientY: 0,
+      };
+      this.initData();
     },
     onContextmenu: function (click) {
       click.evt.preventDefault();
@@ -703,7 +801,27 @@ export default {
         }
       }
     },
-
+    onMouseDown: function (click) {
+      if (this.showModel == "tileMap") {
+        if (!this.pointSelect) {
+          let pick = window.viewer.scene.pick(click.position);
+          if (pick && pick.id.name == "navigationPoint") {
+            this.selectMoveEntity = pick.id;
+          }
+        }
+      }
+    },
+    onDragStart: function (click) {
+      if (this.showModel === "pgmMap") {
+        if (typeof click.target.attrs.id != "undefined") {
+          this.selectPoint2Id = click.target.attrs.id;
+          if (click.evt.type == "touchmove") {
+            this.selectPoint2X = click.evt.touches[0].clientX;
+            this.selectPoint2Y = click.evt.touches[0].clientY;
+          }
+        }
+      }
+    },
     onDragMove: function (click) {
       if (this.selectPoint2Id != -1) {
         let id = this.selectPoint2Id;
@@ -714,11 +832,6 @@ export default {
           layerX = click.evt.layerX;
           layerY = click.evt.layerY;
         } else {
-          //let pgmContainerDiv = document.getElementById("pgmContainer");
-          //var reactObj = pgmContainerDiv.getBoundingClientRect();
-
-          //layerX = click.evt.touches[0].clientX + click.evt.layerX;
-          //layerY = click.evt.touches[0].clientY + click.evt.layerY;
           let distanceX = click.evt.touches[0].clientX - this.selectPoint2X;
           let distanceY = click.evt.touches[0].clientY - this.selectPoint2Y;
           this.selectPoint2X = click.evt.touches[0].clientX;
@@ -799,9 +912,6 @@ export default {
           this.selectArrowY = click.evt.touches[0].clientY;
         } else {
           if (this.pointSelect) {
-            //let pgmContainerDiv = document.getElementById("pgmContainer");
-            //var reactObj = pgmContainerDiv.getBoundingClientRect();
-
             let layerX =
               click.evt.touches[0].clientX +
               click.evt.layerX -
@@ -872,17 +982,8 @@ export default {
     onTouchMoveForArrow: function (click) {
       if (this.showModel === "pgmMap") {
         if (this.selectArrowId != -1) {
-          //let pgmContainerDiv = document.getElementById("pgmContainer");
-          //var reactObj = pgmContainerDiv.getBoundingClientRect();
-
           let tleft = click.evt.touches[0].clientX - this.selectArrowX;
           let ttop = click.evt.touches[0].clientY - this.selectArrowY;
-
-          //let layerX = click.evt.touches[0].clientX - reactObj.left;
-          //let layerY = click.evt.touches[0].clientY - reactObj.top;
-
-          //var tleft = layerX - this.konvaConfig.points[Number(this.selectArrowId)].x;
-          //var ttop = layerY - this.konvaConfig.points[Number(this.selectArrowId)].y;
           var angle = Math.atan2(ttop - 0, tleft - 0);
           this.konvaConfig.points[Number(this.selectArrowId)].omega =
             angle / (3.14159 / 180);
@@ -1032,7 +1133,11 @@ export default {
         (this.task.params.point = []),
           (this.$refs.btn1.$el.innerText = "保存导航点");
 
-        if (this.showModel === "pgmMap") {
+        if (this.showModel == "tileMap") {
+          this.selectMoveEntity = null;
+          this.polylineEntity = null;
+          window.viewer.entities.removeAll();
+        } else if (this.showModel === "pgmMap") {
           this.konvaConfig.points = [];
           this.konvaConfig.polyline = [];
         }
@@ -1092,7 +1197,7 @@ export default {
       }
     },
     async onOk() {
-      console.log("onOk");
+      console.log("this.task", this.task);
     },
     onCancel: function () {
       console.log("onCancel");
@@ -1124,6 +1229,12 @@ export default {
     deleteStationItem: function (index) {
       this.selectPoint.station.splice(index, 1);
     },
+    showContainer() {
+      if (this.showModel === "pgmMap") {
+        var pgmContainer = document.getElementById("pgmContainer");
+        pgmContainer.style.display = "block";
+      }
+    },
     openWebsocket() {
       for (let i = 0; i < this.deviceList.length; i++) {
         let item = this.deviceList[i];
@@ -1154,7 +1265,8 @@ export default {
           let location = locations[i];
 
           //console.log(location);
-          if (this.showModel == "pgmMap") {
+
+          if (this.showModel === "pgmMap") {
             location.x = Math.abs(location.x);
             location.y = Math.abs(location.y);
             this.curLocationPosition = location;
@@ -1243,7 +1355,7 @@ export default {
 
             await this.onSelectChange();
 
-            if (this.showModel == "pgmMap") {
+            if (this.showModel === "pgmMap") {
               var pointArr = [];
               for (let item of this.task.params.point.values()) {
                 this.points.set(this.konvaConfig.points.length, item);
@@ -1280,12 +1392,17 @@ export default {
     },
   },
   mounted() {
+    this.showContainer();
+
     this.handleMetaTaskQuery();
     this.handleIdentifierQuery();
 
     this.handleMapQuery().then(() => {
       this.handleScenceQuery().then(() => {
-        if (!this.deviceId && !this.taskId) {
+        if (
+          (typeof this.deviceId == "undefined" || this.deviceId == "") &&
+          (typeof this.taskId == "undefined" || this.taskId == "")
+        ) {
           this.handleDeviceQuery();
         }
 
@@ -1310,11 +1427,6 @@ export default {
   },
   beforeDestroy() {
     this.closeWebsocket();
-  },
-  destroyed() {
-    if (window.viewer != null) {
-      window.viewer.destroy();
-    }
   },
 };
 </script>
