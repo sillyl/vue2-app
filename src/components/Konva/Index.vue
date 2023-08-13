@@ -497,6 +497,7 @@ export default {
         x: stage.getPointerPosition().x / oldScale - stage.x() / oldScale,
         y: stage.getPointerPosition().y / oldScale - stage.y() / oldScale,
       };
+      console.log("stage.getPointerPosition()", stage.getPointerPosition());
       const newScale =
         e.evt.deltaY > 0 ? oldScale * scaleBy : oldScale / scaleBy;
       stage.scale({ x: newScale, y: newScale });
@@ -508,6 +509,17 @@ export default {
           (-mousePointTo.y + stage.getPointerPosition().y / newScale) * newScale
         );
         stage.batchDraw();
+        const scale = e.evt.deltaY > 0 ? scaleBy : 1 / scaleBy;
+        this.triggerPosition = {
+          layerX:
+            stage.getPointerPosition().x +
+            (-stage.getPointerPosition().x + this.triggerPosition.layerX) *
+              scale,
+          layerY:
+            stage.getPointerPosition().y +
+            (-stage.getPointerPosition().y + this.triggerPosition.layerY) *
+              scale,
+        };
       });
     },
     deleteCircleTooltipData: function (data) {
@@ -631,14 +643,6 @@ export default {
       const touch2 = e.evt.touches[1];
       if (touch1 && touch2) {
         this.isTouchmoveing = true;
-        this.isTouchStart = false;
-        const stage = this.$refs.konvaStage.getStage();
-        // const nodes = this.$refs.konvaStage.getNode();
-        // console.log('rrr',stage,'node' , nodes);
-        console.log("stage", stage, this.$refs.konvaStage);
-        if (stage.isDragging()) {
-          stage.stopDrag();
-        }
         const p1 = {
           x: touch1.clientX,
           y: touch1.clientY,
@@ -649,49 +653,44 @@ export default {
         };
         if (!lastCenter) {
           lastCenter = getCenter(p1, p2);
+          lastDist = getDistance(p1, p2);
           return;
         }
 
         const newCenter = getCenter(p1, p2); // 缩放中心
-        const dist = getDistance(p1, p2); // 两指距离
-        if (!lastDist) {
-          lastDist = dist;
-        }
-        const { pageX, pageY } = this.triggerPosition;
-        const dom = document.getElementById("pgmContainer");
-        const cx = pageX - dom.offsetLeft + dom.scrollLeft;
-        const cy = pageY - dom.offsetTop + dom.scrollTop;
-        const pointTo = {
-          x: (newCenter.x - cx) / this.konvaConfig.group.scaleX,
-          y: (newCenter.y - cy) / this.konvaConfig.group.scaleY,
+        const newDist = getDistance(p1, p2); // 两指距离
+        const scaleBy = 1.01;
+        const stage = e.target.getStage();
+        const oldScale = stage.scaleX();
+        const mousePointTo = {
+          x: newCenter.x / oldScale - stage.x() / oldScale,
+          y: newCenter.y / oldScale - stage.y() / oldScale,
         };
-        let scaleX = this.konvaConfig.group.scaleX * (dist / lastDist); //当前缩放后的数值， (dist / lastDist): 缩放的比例
-        let scaleY = this.konvaConfig.group.scaleY * (dist / lastDist);
-        this.konvaConfig.scaleDistance = scaleX;
-        // this.konvaConfig.group.scaleX = scaleX;
-        // this.konvaConfig.group.scaleY = scaleY;
-        // this.konvaConfig.group.x = newCenter.x;
-        // this.konvaConfig.group.y = newCenter.y;
-        const dx = newCenter.x - lastCenter.x;
-        const dy = newCenter.y - lastCenter.y;
-        const newPos = {
-          x: newCenter.x - pointTo.x * scaleX + dx,
-          y: newCenter.y - pointTo.y * scaleY + dy,
-        };
+        const newScale =
+          newDist > lastDist ? oldScale * scaleBy : oldScale / scaleBy;
+        stage.scale({ x: newScale, y: newScale });
+        this.$nextTick(() => {
+          stage.x((-mousePointTo.x + newCenter.x / newScale) * newScale);
+          stage.y((-mousePointTo.y + newCenter.y / newScale) * newScale);
+          stage.batchDraw();
 
-        // this.triggerPosition = {
-        //     pageX: newPos.x,
-        //     pageY: newPos.y,
-        // };
-        // console.log('this.triggerPosition', pageX, pageY, newPos, this.triggerPosition, this.points);
-        // stage.position(newPos);
-        lastDist = dist;
+          const scale = newDist > lastDist ? scaleBy : 1 / scaleBy;
+          this.triggerPosition = {
+            pageX:
+              newCenter.x + (-newCenter.x + this.triggerPosition.pageX) * scale,
+            pageY:
+              newCenter.y + (-newCenter.y + this.triggerPosition.pageY) * scale,
+          };
+          console.log("jkkkkkk", this.triggerPosition);
+        });
+        lastDist = newDist;
         lastCenter = newCenter;
       }
     },
     onStageTouchend: function () {
       lastDist = 0;
       lastCenter = null;
+      this.isTouchmoveing = false;
     },
     initData: function () {
       this.visibleCircleTooltip = true;
@@ -885,7 +884,7 @@ export default {
 
               let x = click.evt.clientX;
               let y = click.evt.clientY;
-              this.showPgmLayer({ x, y });
+              // this.showPgmLayer({ x, y });
             }
           }
         }
@@ -905,7 +904,7 @@ export default {
 
           let x = click.evt.changedTouches[0].clientX;
           let y = click.evt.changedTouches[0].clientY;
-          this.showPgmLayer({ x, y });
+          // this.showPgmLayer({ x, y });
         } else {
           this.hidePgmLayer();
         }
@@ -1431,7 +1430,6 @@ export default {
         return false;
       }
     },
-    //创建任务
     async handleInitTask() {
       if (typeof this.taskId != "undefined") {
         let response = await getTaskInfo(this.taskId);

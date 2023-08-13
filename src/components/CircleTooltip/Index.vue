@@ -214,8 +214,10 @@ export default {
   watch: {
     triggerPosition: function (newVal, oldVal) {
       const res = isEqual(newVal, oldVal);
-      this.isContent = res;
-      console.log("this.isContent", this.isContent);
+      if (!this.circleNeedData.isTouchmoveing) {
+        this.isContent = res;
+      }
+      return !res;
     },
   },
   mounted() {
@@ -250,14 +252,6 @@ export default {
           const Len2 = 80 / 2;
           this.contentTop = this.curLayerY - Len2;
           this.contentLeft = this.curLayerX - Len2;
-          // this.directions.cx = this.curLayerX;
-          // this.directions.cy = this.curLayerY;
-          // this.circleData.curLayerUvX = (
-          //   this.curLayerX / this.circleNeedData.stage.width
-          // ).toFixed(6);
-          // this.circleData.curLayerUvY = (
-          //   this.curLayerY / this.circleNeedData.stage.height
-          // ).toFixed(6);
         }
       }
     } else {
