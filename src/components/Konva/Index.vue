@@ -466,6 +466,8 @@ export default {
       konvaScrollStartY: -1,
       navigationPoint: null,
       curClickPointCartesian: null,
+      stageScale: 1,
+      stagePointerPosition: null,
     };
   },
   computed: {
@@ -483,6 +485,8 @@ export default {
           metaTaskList: this.metaTaskList, // 动作
           selectPoint: this.selectPoint, // 选择点
         },
+        stageScale: this.stageScale,
+        stagePointerPosition: this.stagePointerPosition,
       };
     },
   },
@@ -622,7 +626,7 @@ export default {
     onStageTouchstart: function (e) {
       const len = e.evt.touches.length;
       const { pageX, pageY } = e.evt.touches[0];
-      // console.log("onStageTouchstart", pageX, pageY, pageX > 0);
+      console.log("onStageTouchstart", e.evt, e.evt.touches[0], pageX, pageY);
       if (len >= 2) {
         // console.log("hhhh");
         clearTimeout(timeId);
@@ -672,18 +676,34 @@ export default {
           x: (newCenter.x - stage.x()) / stage.scaleX(),
           y: (newCenter.y - stage.y()) / stage.scaleX(),
         };
+        console.log("uuuu", stage.x(), stage.y());
 
-        const circlePointTo = {
-          x:
-            (newCenter.x -
-              (this.triggerPosition.pageX - dom.offsetLeft + dom.scrollLeft)) /
-            stage.scaleX(),
-          y:
-            (newCenter.y -
-              (this.triggerPosition.pageY - dom.offsetTop + dom.scrollTop)) /
-            stage.scaleX(),
+        let circlePointTo = {
+          x: 0,
+          y: 0,
         };
+        if (this.triggerPosition) {
+          circlePointTo = {
+            x:
+              (newCenter.x -
+                (this.triggerPosition.pageX -
+                  dom.offsetLeft +
+                  dom.scrollLeft)) /
+              stage.scaleX(),
+            y:
+              (newCenter.y -
+                (this.triggerPosition.pageY - dom.offsetTop + dom.scrollTop)) /
+              stage.scaleX(),
+          };
+        }
+
         const scale = stage.scaleX() * (newDist / lastDist);
+        this.stageScale = scale;
+        this.stagePointerPosition = {
+          x: stage.x(),
+          y: stage.y(),
+        };
+        // this.stagePointerPosition
         // console.log('pointTo', pointTo.x, pointTo.y + '\n', 'stage', stage.x(), stage.y() + '\n', 'newCenter', newCenter.x, newCenter.y + '\n',
         //     'scale', stage.scaleX(), scale + '\n', 'this.triggerPosition.pageX', this.triggerPosition.pageX, this.triggerPosition.pageY);
         stage.scale({ x: scale, y: scale });

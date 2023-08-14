@@ -469,12 +469,13 @@ export default {
           location: {
             omega: this.form.omega,
             x: (
-              (cx / this.circleNeedData.stage.width) *
-              this.circleNeedData.stageScale
+              cx /
+              (this.circleNeedData.stage.width * this.circleNeedData.stageScale)
             ).toFixed(6),
             y: (
-              (cy / this.circleNeedData.stage.height) *
-              this.circleNeedData.stageScale
+              cy /
+              (this.circleNeedData.stage.height *
+                this.circleNeedData.stageScale)
             ).toFixed(6),
           },
           process: this.form.selectPoint.process,
