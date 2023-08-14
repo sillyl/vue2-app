@@ -429,7 +429,7 @@ export default {
     },
     onSubmit() {
       // 传递父组件需要数据
-      const point = {
+      let point = {
         location: {
           omega: this.form.omega,
           x: this.circleData.curLayerUvX,
@@ -438,6 +438,53 @@ export default {
         process: this.form.selectPoint.process,
         station: this.form.selectPoint.station,
       };
+
+      if (
+        this.circleNeedData.stageScale &&
+        this.circleNeedData.stagePointerPosition
+      ) {
+        const { pageX, pageY, layerX, layerY, clientX, clientY } =
+          this.triggerPosition;
+        const dom = document.getElementById(this.parentId);
+        console.log(
+          "dd",
+          this.directions.cx,
+          dom.offsetLeft,
+          dom.scrollLeft,
+          this.circleNeedData.stagePointerPosition.x,
+          this.circleNeedData.stageScale,
+          this.circleNeedData.stage.width,
+          this.circleNeedData.stage.height
+        );
+
+        const cx =
+          (this.directions.cx - this.circleNeedData.stagePointerPosition.x) /
+          this.circleNeedData.stageScale;
+        const cy =
+          (this.directions.cy - this.circleNeedData.stagePointerPosition.y) /
+          this.circleNeedData.stageScale;
+        // const cx = pageX;
+        // const cy = pageY;
+        point = {
+          location: {
+            omega: this.form.omega,
+            x: (
+              (cx / this.circleNeedData.stage.width) *
+              this.circleNeedData.stageScale
+            ).toFixed(6),
+            y: (
+              (cy / this.circleNeedData.stage.height) *
+              this.circleNeedData.stageScale
+            ).toFixed(6),
+          },
+          process: this.form.selectPoint.process,
+          station: this.form.selectPoint.station,
+        };
+        this.directions = {
+          cx,
+          cy,
+        };
+      }
 
       this.$emit("saveCircleTooltipData", {
         triggerPoint: point,
