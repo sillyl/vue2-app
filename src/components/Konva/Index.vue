@@ -639,50 +639,74 @@ export default {
       }
     },
     onStageTouchmove: function (e) {
+      e.evt.preventDefault();
+      const dom = document.getElementById("pgmContainer");
       const touch1 = e.evt.touches[0];
       const touch2 = e.evt.touches[1];
       if (touch1 && touch2) {
         this.isTouchmoveing = true;
+        const stage = this.$refs.konvaStage.getStage();
+        if (stage.isDragging()) {
+          stage.stopDrag();
+        }
         const p1 = {
-          x: touch1.clientX,
-          y: touch1.clientY,
+          x: touch1.pageX,
+          y: touch1.pageY,
         };
         const p2 = {
-          x: touch2.clientX,
-          y: touch2.clientY,
+          x: touch2.pageX,
+          y: touch2.pageY,
         };
+
         if (!lastCenter) {
           lastCenter = getCenter(p1, p2);
-          lastDist = getDistance(p1, p2);
           return;
         }
 
+        if (!lastDist) {
+          lastDist = getDistance(p1, p2);
+        }
         const newCenter = getCenter(p1, p2); // 缩放中心
         const newDist = getDistance(p1, p2); // 两指距离
-        const scaleBy = 1.01;
-        const stage = e.target.getStage();
-        const oldScale = stage.scaleX();
-        const mousePointTo = {
-          x: newCenter.x / oldScale - stage.x() / oldScale,
-          y: newCenter.y / oldScale - stage.y() / oldScale,
+        const pointTo = {
+          x: (newCenter.x - stage.x()) / stage.scaleX(),
+          y: (newCenter.y - stage.y()) / stage.scaleX(),
         };
-        const newScale =
-          newDist > lastDist ? oldScale * scaleBy : oldScale / scaleBy;
-        stage.scale({ x: newScale, y: newScale });
-        this.$nextTick(() => {
-          stage.x((-mousePointTo.x + newCenter.x / newScale) * newScale);
-          stage.y((-mousePointTo.y + newCenter.y / newScale) * newScale);
-          stage.batchDraw();
 
-          const scale = newDist > lastDist ? scaleBy : 1 / scaleBy;
-          this.triggerPosition = {
-            pageX:
-              newCenter.x + (-newCenter.x + this.triggerPosition.pageX) * scale,
-            pageY:
-              newCenter.y + (-newCenter.y + this.triggerPosition.pageY) * scale,
-          };
-          console.log("jkkkkkk", this.triggerPosition);
-        });
+        const circlePointTo = {
+          x:
+            (newCenter.x -
+              (this.triggerPosition.pageX - dom.offsetLeft + dom.scrollLeft)) /
+            stage.scaleX(),
+          y:
+            (newCenter.y -
+              (this.triggerPosition.pageY - dom.offsetTop + dom.scrollTop)) /
+            stage.scaleX(),
+        };
+        const scale = stage.scaleX() * (newDist / lastDist);
+        // console.log('pointTo', pointTo.x, pointTo.y + '\n', 'stage', stage.x(), stage.y() + '\n', 'newCenter', newCenter.x, newCenter.y + '\n',
+        //     'scale', stage.scaleX(), scale + '\n', 'this.triggerPosition.pageX', this.triggerPosition.pageX, this.triggerPosition.pageY);
+        stage.scale({ x: scale, y: scale });
+        const dx = newCenter.x - lastCenter.x;
+        const dy = newCenter.y - lastCenter.y;
+        const newPos = {
+          x: newCenter.x - pointTo.x * scale + dx,
+          y: newCenter.y - pointTo.y * scale + dy,
+        };
+
+        this.triggerPosition = {
+          pageX:
+            newCenter.x -
+            circlePointTo.x * scale +
+            dx +
+            (dom.offsetLeft - dom.scrollLeft),
+          pageY:
+            newCenter.y -
+            circlePointTo.y * scale +
+            dy +
+            (dom.offsetTop - dom.scrollTop),
+        };
+        stage.position(newPos);
         lastDist = newDist;
         lastCenter = newCenter;
       }
