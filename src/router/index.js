@@ -23,8 +23,12 @@ const routes = [
   {
     path: "/cesiumViewer",
     name: "cesiumViewer",
-    component: () =>
-      import(/* webpackChunkName: "about" */ "@/components/CesiumViewer/Index.vue"),
+    component: () => import(/* webpackChunkName: "about" */ "@/components/CesiumViewer/Index.vue"),
+  },
+  {
+    path: "/VideoPlayer",
+    name: "VideoPlayer",
+    component: () => import(/* webpackChunkName: "about" */ "@/components/VideoPlayer/Index.vue"),
   },
 ];
 

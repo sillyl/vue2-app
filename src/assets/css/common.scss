@@ -1,0 +1,71 @@
+body {  
+  height: 100vh;
+  padding: 0; 
+  margin: 0;
+  font-family: "Helvetica Neue For Number", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 12px;
+}
+
+
+/* 公共样式变量 */
+$primary-color: #409EFF;
+$error-color: #F56C6C;
+$success-color:#67C23A;
+$info-color:#909399;
+
+h1,h2,h3,h4,p,ul,li {
+  padding: 0;
+  margin: 0;
+}
+
+ul {
+  list-style: none; 
+}
+
+a {
+  text-decoration: none;
+
+  /* color: #0a6efa; */
+  color: $primary-color;
+}
+
+img {
+  vertical-align: middle;
+}
+
+/* 超长...展示 */
+.text_overflow_160 {
+  display: inline-block;
+  width: 160px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* 超长展示n行，剩余...展示 */
+.text_mutil_overflow_160 {
+  display: -webkit-box;
+  width: 160px;
+  overflow: hidden;
+  line-height: 16px;
+  text-overflow: ellipsis;
+  word-break: break-all;
+  -webkit-line-clamp: 2; /* 展示行数 */
+  -webkit-box-orient: vertical;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-thumb {
+  cursor: pointer;
+  background: #d8d8d8;
+  border-radius: 5px;
+  transition: color 0.2s ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgb(0 0 0 / 30%);
+}
