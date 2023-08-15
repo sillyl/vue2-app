@@ -17,4 +17,7 @@ module.exports = {
     "no-unused-vars": "off",
     "vue/multi-word-component-names": "off",
   },
+  globals: {
+    "Cesium": true
+  }
 };

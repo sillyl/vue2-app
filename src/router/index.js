@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import Vue from "vue";
 import VueRouter from "vue-router";
 import HomeView from "../views/HomeView.vue";
@@ -19,6 +20,12 @@ const routes = [
   //   component: () =>
   //     import(/* webpackChunkName: "about" */ "../views/AboutView.vue"),
   // },
+  {
+    path: "/cesiumViewer",
+    name: "cesiumViewer",
+    component: () =>
+      import(/* webpackChunkName: "about" */ "@/components/CesiumViewer/Index.vue"),
+  },
 ];
 
 const router = new VueRouter({
