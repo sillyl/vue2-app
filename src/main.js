@@ -5,8 +5,9 @@ import "element-ui/lib/theme-chalk/index.css";
 import App from "./App.vue";
 import router from "./router";
 import store from "./store";
-// import '../public/Cesium/Cesium.js';
+import { toDark } from "@/utils/dark";
 
+// toDark(true)
 Vue.config.productionTip = false;
 
 Vue.use(VueKonva);

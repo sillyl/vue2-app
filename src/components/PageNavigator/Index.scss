@@ -1,0 +1,32 @@
+$prefixCls: 'page_navigator';
+
+.#{$prefixCls} {
+  height: calc(100% - 40px);
+  overflow-y: auto;
+  background: #fff;
+  position: relative;
+
+  &_breadcrumb {
+    padding-bottom: 10px;
+
+    .el-breadcrumb {
+      position: absolute;
+      top: 20px;
+      left: 55px;
+    }
+    
+    ::v-deep {
+      .el-page-header__left {
+        &::after {
+          content: '';
+          right: -1px;
+        }
+      }
+    }
+  }
+
+  &_content {
+    height: calc(100% - 28px);
+    overflow-y: auto;
+  };
+}
