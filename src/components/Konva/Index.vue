@@ -139,103 +139,7 @@
         @saveCircleTooltipData="saveCircleTooltipData"
         @deleteCircleTooltipData="deleteCircleTooltipData"
       />
-      <div id="pgmLayer">
-        <el-card class="box-card" style="width: 396px; height: 296px">
-          <div slot="header" class="clearfix">
-            <span>导航路径属性配置</span>
-          </div>
-          <div class="text item">
-            <el-form ref="form" :model="selectPoint" label-width="80px">
-              <el-form-item label="航向(角度)" prop="selectPoint">
-                <el-input
-                  v-model="selectPoint.location.omega"
-                  placeholder="请输入航向角度"
-                  @change="onOmegaChange()"
-                  style="width: 120px"
-                ></el-input>
-              </el-form-item>
-              <el-form-item label="过程属性" prop="process">
-                <el-button @click="addProcessItem()"> + </el-button>
-                <div v-for="(item, index) in selectPoint.process" :key="index">
-                  <el-row>
-                    <el-col :span="10">
-                      <el-select
-                        v-model="selectPoint.process[index].target"
-                        placeholder="--请选择--"
-                      >
-                        <el-option
-                          v-for="item in identifierList"
-                          :key="item.code"
-                          :label="item.name"
-                          :value="item.code"
-                        ></el-option>
-                      </el-select>
-                    </el-col>
-                    <el-col :span="10">
-                      <el-select
-                        v-model="selectPoint.process[index].action"
-                        placeholder="--请选择--"
-                      >
-                        <el-option
-                          v-for="item in metaTaskList"
-                          :key="item.method"
-                          :label="item.name"
-                          :value="item.method"
-                        ></el-option>
-                      </el-select>
-                    </el-col>
-                    <el-col :span="4">
-                      <el-button @click="deleteProcessItem(index)">
-                        -
-                      </el-button>
-                    </el-col>
-                  </el-row>
-                </div>
-              </el-form-item>
-              <el-form-item label="节点属性" prop="process">
-                <el-button @click="addStationItem()"> + </el-button>
-                <div v-for="(item, index) in selectPoint.station" :key="index">
-                  <el-row>
-                    <el-col :span="10">
-                      <el-select
-                        v-model="selectPoint.station[index].target"
-                        placeholder="--目标物--"
-                      >
-                        <el-option
-                          v-for="item in identifierList"
-                          :key="item.code"
-                          :label="item.name"
-                          :value="item.code"
-                        ></el-option>
-                      </el-select>
-                    </el-col>
-                    <el-col :span="10">
-                      <el-select
-                        v-model="selectPoint.station[index].action"
-                        placeholder="--动作--"
-                      >
-                        <el-option
-                          v-for="item in metaTaskList"
-                          :key="item.method"
-                          :label="item.name"
-                          :value="item.method"
-                        ></el-option>
-                      </el-select>
-                    </el-col>
-                    <el-col :span="4">
-                      <el-button @click="deleteStationItem(index)">
-                        -
-                      </el-button>
-                    </el-col>
-                  </el-row>
-                </div>
-              </el-form-item>
-            </el-form>
-          </div>
-        </el-card>
-      </div>
     </div>
-
     <div style="height: 200px; background: #e8e8e8">
       <el-row>
         <el-col :span="10">
@@ -459,9 +363,7 @@ export default {
       curLocationEntity: null, // 当前设备的位置
       curLocationPosition: null,
       polylineEntity: null,
-      travelUrl:
-        this.$store.getters.websocketUrl +
-        "/cpix/v1.0/websocket/device-travel/",
+      travelUrl: this.$store.getters.websocketUrl + "url",
       konvaScrollStartX: -1,
       konvaScrollStartY: -1,
       navigationPoint: null,
@@ -501,7 +403,6 @@ export default {
         x: stage.getPointerPosition().x / oldScale - stage.x() / oldScale,
         y: stage.getPointerPosition().y / oldScale - stage.y() / oldScale,
       };
-      console.log("stage.getPointerPosition()", stage.getPointerPosition());
       const newScale =
         e.evt.deltaY > 0 ? oldScale * scaleBy : oldScale / scaleBy;
       stage.scale({ x: newScale, y: newScale });
@@ -626,12 +527,9 @@ export default {
     onStageTouchstart: function (e) {
       const len = e.evt.touches.length;
       const { pageX, pageY } = e.evt.touches[0];
-      console.log("onStageTouchstart", e.evt, e.evt.touches[0], pageX, pageY);
       if (len >= 2) {
-        // console.log("hhhh");
         clearTimeout(timeId);
       } else {
-        // console.log(".....");
         timeId = setTimeout(() => {
           this.triggerPosition = {
             pageX,
@@ -676,8 +574,6 @@ export default {
           x: (newCenter.x - stage.x()) / stage.scaleX(),
           y: (newCenter.y - stage.y()) / stage.scaleX(),
         };
-        console.log("uuuu", stage.x(), stage.y());
-
         let circlePointTo = {
           x: 0,
           y: 0,
@@ -703,9 +599,6 @@ export default {
           x: stage.x(),
           y: stage.y(),
         };
-        // this.stagePointerPosition
-        // console.log('pointTo', pointTo.x, pointTo.y + '\n', 'stage', stage.x(), stage.y() + '\n', 'newCenter', newCenter.x, newCenter.y + '\n',
-        //     'scale', stage.scaleX(), scale + '\n', 'this.triggerPosition.pageX', this.triggerPosition.pageX, this.triggerPosition.pageY);
         stage.scale({ x: scale, y: scale });
         const dx = newCenter.x - lastCenter.x;
         const dy = newCenter.y - lastCenter.y;
@@ -840,12 +733,6 @@ export default {
       this.konvaConfig.pgmImage = null;
       this.konvaConfig.points = [];
       this.konvaConfig.polyline = [];
-
-      if (window.viewer != null) {
-        window.viewer.destroy();
-        window.viewer = null;
-      }
-
       var mapInfo = null;
       for (let i = 0; i < this.mapList.length; i++) {
         if (this.mapList[i].id == this.scence.mapId) {
@@ -901,7 +788,6 @@ export default {
       };
       this.initData();
     },
-    onMouseRightClick: function (click) {},
     onContextmenu: function (click) {
       click.evt.preventDefault();
     },
@@ -928,7 +814,6 @@ export default {
 
               let x = click.evt.clientX;
               let y = click.evt.clientY;
-              // this.showPgmLayer({ x, y });
             }
           }
         }
@@ -948,24 +833,11 @@ export default {
 
           let x = click.evt.changedTouches[0].clientX;
           let y = click.evt.changedTouches[0].clientY;
-          // this.showPgmLayer({ x, y });
         } else {
           this.hidePgmLayer();
         }
       }
     },
-    onMouseDown: function (click) {
-      if (this.showModel == "tileMap") {
-        if (!this.pointSelect) {
-          let pick = window.viewer.scene.pick(click.position);
-          if (pick && pick.id.name == "navigationPoint") {
-            this.selectMoveEntity = pick.id;
-          }
-        }
-      }
-    },
-    onMouseMove: function (click) {},
-    onMouseUp: function (click) {},
     onDragStart: function (click) {
       if (this.showModel === "pgmMap") {
         if (typeof click.target.attrs.id != "undefined") {
@@ -987,11 +859,6 @@ export default {
           layerX = click.evt.layerX;
           layerY = click.evt.layerY;
         } else {
-          //let pgmContainerDiv = document.getElementById("pgmContainer");
-          //var reactObj = pgmContainerDiv.getBoundingClientRect();
-
-          //layerX = click.evt.touches[0].clientX + click.evt.layerX;
-          //layerY = click.evt.touches[0].clientY + click.evt.layerY;
           let distanceX = click.evt.touches[0].clientX - this.selectPoint2X;
           let distanceY = click.evt.touches[0].clientY - this.selectPoint2Y;
           this.selectPoint2X = click.evt.touches[0].clientX;
@@ -1072,9 +939,6 @@ export default {
           this.selectArrowY = click.evt.touches[0].clientY;
         } else {
           if (this.pointSelect) {
-            //let pgmContainerDiv = document.getElementById("pgmContainer");
-            //var reactObj = pgmContainerDiv.getBoundingClientRect();
-
             let layerX =
               click.evt.touches[0].clientX +
               click.evt.layerX -
@@ -1100,8 +964,6 @@ export default {
 
             let item = { x: layerX, y: layerY, omega: 0 };
             this.konvaConfig.points.push(item);
-
-            console.log("onTouchStartForArrow");
           }
 
           if (click.evt.touches.length >= 2) {
@@ -1145,27 +1007,15 @@ export default {
     onTouchMoveForArrow: function (click) {
       if (this.showModel === "pgmMap") {
         if (this.selectArrowId != -1) {
-          //let pgmContainerDiv = document.getElementById("pgmContainer");
-          //var reactObj = pgmContainerDiv.getBoundingClientRect();
-
           let tleft = click.evt.touches[0].clientX - this.selectArrowX;
           let ttop = click.evt.touches[0].clientY - this.selectArrowY;
-
-          //let layerX = click.evt.touches[0].clientX - reactObj.left;
-          //let layerY = click.evt.touches[0].clientY - reactObj.top;
-
-          //var tleft = layerX - this.konvaConfig.points[Number(this.selectArrowId)].x;
-          //var ttop = layerY - this.konvaConfig.points[Number(this.selectArrowId)].y;
           var angle = Math.atan2(ttop - 0, tleft - 0);
           this.konvaConfig.points[Number(this.selectArrowId)].omega =
             angle / (3.14159 / 180);
 
           let curPoint = this.points.get(this.selectArrowId);
           curPoint.location.omega = angle / (3.14159 / 180);
-
-          console.log("onTouchMoveForArrow");
         } else {
-          console.log("2222222222222222222222onTouchMoveForArrow");
           if (click.evt.touches.length >= 2) {
             // const stage = this.$refs.konvaStage.getStage();
             // const scaleBy = 1.2;
@@ -1270,14 +1120,9 @@ export default {
       this.pointSelect = !this.pointSelect;
       if (this.pointSelect) {
         this.points.clear();
-        (this.task.params.point = []),
-          (this.$refs.btn1.$el.innerText = "保存导航点");
-
-        if (this.showModel == "tileMap") {
-          this.selectMoveEntity = null;
-          this.polylineEntity = null;
-          window.viewer.entities.removeAll();
-        } else if (this.showModel === "pgmMap") {
+        this.task.params.point = [];
+        this.$refs.btn1.$el.innerText = "保存导航点";
+        if (this.showModel === "pgmMap") {
           this.konvaConfig.points = [];
           this.konvaConfig.polyline = [];
         }
@@ -1341,17 +1186,6 @@ export default {
     },
     onCancel: function () {
       console.log("onCancel");
-    },
-    getLocation() {},
-    showPgmLayer(position) {
-      var pgmLayer = document.getElementById("pgmLayer");
-      pgmLayer.style.left = position.x + "px";
-      pgmLayer.style.top = position.y + "px";
-      pgmLayer.style.display = "block";
-    },
-    hidePgmLayer() {
-      var pgmLayer = document.getElementById("pgmLayer");
-      pgmLayer.style.display = "none";
     },
     onOmegaChange: function () {
       this.konvaConfig.points[this.selectPointId].omega =
