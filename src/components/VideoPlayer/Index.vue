@@ -1,12 +1,15 @@
 <template>
   <div
-    class="video-float-window"
-    id="video-float-window"
+    class="video-player"
+    id="video-player"
     @mousedown="onCircleMousedown"
     :style="{ top: top + 'px', left: left + 'px' }"
+    v-if="isShow"
   >
-    <div class="video-float-window-header">x</div>
-    <div class="video-float-window-content">
+    <div class="video-player-header">
+      <span class="video-player-header-x" @click="onClickClosed">x</span>
+    </div>
+    <div class="video-player-content">
       <video-player
         class="video-player vjs-custom-skin"
         ref="videoPlayer"
@@ -25,10 +28,12 @@ import "videojs-flash";
 import Hammer from 'hammerjs';
 export default {
   name: "VideoPlayer",
+  props: ["isShow"],
   data() {
     return {
       top: 0,
       left: 0,
+      isClosed: this.isShow || false,
       playerOptions: {
         playbackRates: [0.5, 1.0, 1.5, 2.0], // 可选的播放速度
         autoplay: false, // 如果为true,浏览器准备好时开始回放。
@@ -58,24 +63,38 @@ export default {
     videoPlayer
   },
   methods: {
+    onClickClosed: function(){
+      const dom = document.getElementById("video-player");
+      dom.style.display = "none"
+    },
     onCircleMousedown: function () {
+      const dom = document.getElementById("video-player");
+      let width = 300 / 2;
+      let height = 200 / 2;
+      if (dom) {
+        width = dom.offsetWidth / 2;
+        height = dom.offsetHeight / 2;
+      }
       (document.onmousemove = (el) => {
-        console.log("el", el);
-        this.top = el.clientX;
-        this.left = el.clientY;
+        this.left = el.clientX - width; // 保持中心位置拖拽
+        this.top = el.clientY - height;
       }),
       (document.onmouseup = () => {
         document.onmousemove = null;
       });
     },
   },
+  destroyed() {
+  // 
+  },
 };
 </script>
 <style lang="scss" scoped>
-$className: "video-float-window";
+$className: "video-player";
 .#{$className} {
   width: 300px;
-  border: 1px solid;
+  border: 1px solid rgb(58, 58, 68);
+  position: absolute;
   cursor: pointer;
   &-header {
     width: 300px;
@@ -84,6 +103,10 @@ $className: "video-float-window";
     text-align: center;
     background-color: #8ec5fc;
     background-image: linear-gradient(62deg, #8ec5fc 0%, #e0c3fc 100%);
+    &-x{
+      float: right;
+      margin: 0 16px;
+    }
   }
 }
 

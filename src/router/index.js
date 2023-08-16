@@ -26,9 +26,10 @@ const routes = [
     component: () => import(/* webpackChunkName: "about" */ "@/components/CesiumViewer/Index.vue"),
   },
   {
-    path: "/VideoPlayer",
+    path: "/videoPlayer",
     name: "VideoPlayer",
-    component: () => import(/* webpackChunkName: "about" */ "@/components/VideoPlayer/Index.vue"),
+    component: () => import(/* webpackChunkName: "about" */ "@/views/Video/Index.vue"),
+    // component: () => import(/* webpackChunkName: "about" */ "@/components/VideoPlayer/Index.vue"),
   },
 ];
 
