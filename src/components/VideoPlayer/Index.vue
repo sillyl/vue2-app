@@ -2,7 +2,6 @@
   <div
     class="video-player"
     id="video-player"
-    @mousedown="onCircleMousedown"
     :style="{ top: top + 'px', left: left + 'px' }"
     v-if="isShow"
   >

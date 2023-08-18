@@ -6,14 +6,24 @@
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
     <link rel="icon" href="<%= BASE_URL %>favicon.ico">
     <title>vue2-app</title>
-    <script src="./Cesium/Cesium.js"></script>
     <script src="./wfs/wfs.js"></script>
     <style>
-      @import url(./Cesium/Widgets/widgets.css);
     </style>
   </head>
   <body>
-    <div id="app"></div>
+    <video
+        ref="video"
+        muted
+        autoplay
+        controls="controls"
+        disablePictureInPicture
+        controlsList="nodownload noremoteplayback noplaybackrate"
+        src="http://192.168.8.9:9001/cc"
+        style="width: 100%; height: 100%"
+      >
+        <!-- <track srclang="zh-cn" kind="subtitles" default src="./fractions.vtt" /> -->
+        你的浏览器不支持 video 标签
+      </video>
     <!-- built files will be auto injected -->
   </body>
 </html>

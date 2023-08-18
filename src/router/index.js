@@ -25,11 +25,17 @@ const routes = [
     name: "cesiumViewer",
     component: () => import(/* webpackChunkName: "about" */ "@/components/CesiumViewer/Index.vue"),
   },
+  // {
+  //   path: "/videoPlayer",
+  //   name: "VideoPlayer",
+  //   component: () => import(/* webpackChunkName: "about" */ "@/views/Video/Index.vue"),
+  //   // component: () => import(/* webpackChunkName: "about" */ "@/components/VideoPlayer/Index.vue"),
+  // },
   {
-    path: "/videoPlayer",
-    name: "VideoPlayer",
+    path: "/wfs",
+    name: "Wfs",
+    // component: () => import(/* webpackChunkName: "about" */ "@/components/Wfs/Index.vue"),
     component: () => import(/* webpackChunkName: "about" */ "@/views/Video/Index.vue"),
-    // component: () => import(/* webpackChunkName: "about" */ "@/components/VideoPlayer/Index.vue"),
   },
 ];
 

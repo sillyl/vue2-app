@@ -18,7 +18,8 @@ module.exports = {
     "vue/multi-word-component-names": "off",
   },
   globals: {
-    "Cesium": true,
+    Cesium: true,
+    Wfs: true,
     // "videoPlayer": true
-  }
+  },
 };
