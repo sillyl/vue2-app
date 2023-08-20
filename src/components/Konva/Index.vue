@@ -369,7 +369,10 @@ export default {
       navigationPoint: null,
       curClickPointCartesian: null,
       stageScale: 1,
-      stagePointerPosition: null,
+      stagePointerPosition: {
+        x: 0,
+        y: 0,
+      },
     };
   },
   computed: {
@@ -794,14 +797,14 @@ export default {
     onMouseClick: function (click) {
       if (click.evt.button == 0) {
         if (!this.pointSelect) {
-          this.hidePgmLayer();
+          // this.hidePgmLayer();
         }
       } else if (click.evt.button == 2) {
         if (!this.pointSelect) {
           if (this.showModel === "pgmMap") {
             let id = click.target.attrs.id;
             if (typeof id == "undefined") {
-              this.hidePgmLayer();
+              // this.hidePgmLayer();
             } else {
               this.selectPoint = {
                 location: { omega: 0 },
@@ -834,7 +837,7 @@ export default {
           let x = click.evt.changedTouches[0].clientX;
           let y = click.evt.changedTouches[0].clientY;
         } else {
-          this.hidePgmLayer();
+          // this.hidePgmLayer();
         }
       }
     },
