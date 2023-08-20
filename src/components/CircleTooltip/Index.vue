@@ -264,52 +264,52 @@ export default {
             this.left = this.directions.cx - 33.6 / 2;
             this.contentTop = this.top;
             this.contentLeft = this.left;
+            // this.circleData.curLayerUvX = (
+            //   this.directions.cx / this.circleNeedData.stage.width
+            // ).toFixed(6);
+            // this.circleData.curLayerUvY = (
+            //   this.directions.cy / this.circleNeedData.stage.height
+            // ).toFixed(6);
+            // console.log(
+            //   "updated0000",
+            //   this.circleData.curLayerUvX,
+            //   this.circleData.curLayerUvY
+            // );
+
+            // if (
+            //   this.circleNeedData.stageScale &&
+            //   this.circleNeedData.stagePointerPosition
+            // ) {
+            // touch scale不等于1 时，重新你计算组件UV
+            const cx =
+              (this.directions.cx -
+                this.circleNeedData.stagePointerPosition.x) /
+              1;
+            // this.directions.cx = cx;÷
+            const cy =
+              (this.directions.cy -
+                this.circleNeedData.stagePointerPosition.y) /
+              1;
+            // console.log("cxupdate", cx, cy, this.circleNeedData.stageScale);
+            // this.directions.cy = cy;
             this.circleData.curLayerUvX = (
-              this.directions.cx / this.circleNeedData.stage.width
+              cx /
+              (this.circleNeedData.stage.width * this.circleNeedData.stageScale)
             ).toFixed(6);
             this.circleData.curLayerUvY = (
-              this.directions.cy / this.circleNeedData.stage.height
+              cy /
+              (this.circleNeedData.stage.height *
+                this.circleNeedData.stageScale)
             ).toFixed(6);
+            // this.directions = { cx, cy };
             console.log(
-              "updated0000",
+              "updated111",
               this.circleData.curLayerUvX,
-              this.circleData.curLayerUvY
+              this.circleData.curLayerUvY,
+              this.circleNeedData.stageScale
             );
-
-            if (
-              this.circleNeedData.stageScale &&
-              this.circleNeedData.stagePointerPosition
-            ) {
-              // touch scale不等于1 时，重新你计算组件UV
-              const cx =
-                (this.directions.cx -
-                  this.circleNeedData.stagePointerPosition.x) /
-                1;
-              const cy =
-                (this.directions.cy -
-                  this.circleNeedData.stagePointerPosition.y) /
-                1;
-              // console.log("cxupdate", cx, cy, this.circleNeedData.stageScale);
-
-              this.circleData.curLayerUvX = (
-                cx /
-                (this.circleNeedData.stage.width *
-                  this.circleNeedData.stageScale)
-              ).toFixed(6);
-              this.circleData.curLayerUvY = (
-                cy /
-                (this.circleNeedData.stage.height *
-                  this.circleNeedData.stageScale)
-              ).toFixed(6);
-              // this.directions = { cx, cy };
-              console.log(
-                "updated111",
-                this.circleData.curLayerUvX,
-                this.circleData.curLayerUvY,
-                this.circleNeedData.stageScale
-              );
-            }
           }
+          // }
         } else {
           const Len2 = 80 / 2;
           this.contentTop = this.directions.cy - Len2;
@@ -480,6 +480,7 @@ export default {
           omega: this.form.omega,
           x: this.circleData.curLayerUvX,
           y: this.circleData.curLayerUvY,
+          insertScale: 1.0,
         },
         process: this.form.selectPoint.process,
         station: this.form.selectPoint.station,
@@ -511,6 +512,7 @@ export default {
             omega: this.form.omega,
             x: this.circleData.curLayerUvX,
             y: this.circleData.curLayerUvY,
+            insertScale: this.circleNeedData.stageScale,
           },
           process: this.form.selectPoint.process,
           station: this.form.selectPoint.station,

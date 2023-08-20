@@ -30,6 +30,11 @@ const routes = [
     name: "VideoPlayer",
     component: () => import(/* webpackChunkName: "about" */ "@/components/VideoPlayer/Index.vue"),
   },
+  // {
+  //   path: "/demo",
+  //   name: "TreeTable",
+  //   component: () => import(/* webpackChunkName: "about" */ "@/components/TreeTable/demo.vue"),
+  // },
 ];
 
 const router = new VueRouter({
