@@ -270,6 +270,45 @@ export default {
             this.circleData.curLayerUvY = (
               this.directions.cy / this.circleNeedData.stage.height
             ).toFixed(6);
+            console.log(
+              "updated0000",
+              this.circleData.curLayerUvX,
+              this.circleData.curLayerUvY
+            );
+
+            if (
+              this.circleNeedData.stageScale &&
+              this.circleNeedData.stagePointerPosition
+            ) {
+              // touch scale不等于1 时，重新你计算组件UV
+              const cx =
+                (this.directions.cx -
+                  this.circleNeedData.stagePointerPosition.x) /
+                1;
+              const cy =
+                (this.directions.cy -
+                  this.circleNeedData.stagePointerPosition.y) /
+                1;
+              // console.log("cxupdate", cx, cy, this.circleNeedData.stageScale);
+
+              this.circleData.curLayerUvX = (
+                cx /
+                (this.circleNeedData.stage.width *
+                  this.circleNeedData.stageScale)
+              ).toFixed(6);
+              this.circleData.curLayerUvY = (
+                cy /
+                (this.circleNeedData.stage.height *
+                  this.circleNeedData.stageScale)
+              ).toFixed(6);
+              // this.directions = { cx, cy };
+              console.log(
+                "updated111",
+                this.circleData.curLayerUvX,
+                this.circleData.curLayerUvY,
+                this.circleNeedData.stageScale
+              );
+            }
           }
         } else {
           const Len2 = 80 / 2;
@@ -302,11 +341,19 @@ export default {
   methods: {
     onCircleMousedown: function () {
       // 点击已存在坐标显示已存在坐标相关数据
+      console.log(
+        "22222",
+        this.circleData.curLayerUvX,
+        this.circleData.curLayerUvY,
+        this.circleNeedData.points
+      );
       const res = getMinPoint(
         this.circleNeedData.points,
         { x: this.circleData.curLayerUvX, y: this.circleData.curLayerUvY },
         this.threshold
       );
+      console.log("res", res);
+
       this.updateFormData(res);
       (document.onmousemove = (el) => {
         this.isMounseMove = true;
@@ -338,6 +385,13 @@ export default {
         x: this.circleData.curLayerUvX,
         y: this.circleData.curLayerUvY,
       });
+      console.log(
+        "this.circleNeedData.points",
+        this.circleNeedData.points,
+        this.circleData.curLayerUvX,
+        this.circleData.curLayerUvY
+      );
+
       this.updateFormData(res);
     },
     onTouchmove: function (e) {
@@ -450,11 +504,13 @@ export default {
           cy /
           (this.circleNeedData.stage.height * this.circleNeedData.stageScale)
         ).toFixed(6));
+        console.log("3333", curLayerUvX, curLayerUvY);
+
         point = {
           location: {
             omega: this.form.omega,
-            x: curLayerUvX,
-            y: curLayerUvY,
+            x: this.circleData.curLayerUvX,
+            y: this.circleData.curLayerUvY,
           },
           process: this.form.selectPoint.process,
           station: this.form.selectPoint.station,
