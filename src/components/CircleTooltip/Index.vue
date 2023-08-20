@@ -146,7 +146,7 @@
           </el-form-item>
           <el-form-item>
             <el-button @click="onDelete">删除</el-button>
-            <el-button type="primary" @click="onSubmit">保存</el-button>
+            <el-button type="primary" @click="onSave">保存</el-button>
           </el-form-item>
         </el-form>
       </div>
@@ -237,8 +237,6 @@ export default {
           const Len1 = 33.6 / 2;
           this.top = layerY - Len1;
           this.left = layerX - Len1;
-          this.contentTop = this.top;
-          this.contentLeft = this.left;
           this.directions.cx = layerX;
           this.directions.cy = layerY;
           this.circleData.curLayerUvX = (
@@ -412,23 +410,17 @@ export default {
         process: [],
         station: [],
       };
-      const point = {
-        location: {
-          omega: this.form.omega,
-          x: this.circleData.curLayerUvX,
-          y: this.circleData.curLayerUvY,
-        },
-        process: this.form.selectPoint.process,
-        station: this.form.selectPoint.station,
-      };
-      this.$emit("deleteCircleTooltipData", {
-        triggerPoint: point,
-        directions: this.directions,
-        visible: false,
-      });
+      const obj = this.processScaleData();
+      this.$emit("deleteCircleTooltipData", obj);
     },
-    onSubmit() {
+    onSave() {
       // 传递父组件需要数据
+      const obj = this.processScaleData();
+      this.$emit("saveCircleTooltipData", obj);
+      this.isContent = false;
+    },
+
+    processScaleData: function () {
       let point = {
         location: {
           omega: this.form.omega,
@@ -438,61 +430,43 @@ export default {
         process: this.form.selectPoint.process,
         station: this.form.selectPoint.station,
       };
-
+      // 缩放比存在时 重新更新坐标位置
       if (
         this.circleNeedData.stageScale &&
         this.circleNeedData.stagePointerPosition
       ) {
-        const { pageX, pageY, layerX, layerY, clientX, clientY } =
-          this.triggerPosition;
-        const dom = document.getElementById(this.parentId);
-        console.log(
-          "dd",
-          this.directions.cx,
-          dom.offsetLeft,
-          dom.scrollLeft,
-          this.circleNeedData.stagePointerPosition.x,
-          this.circleNeedData.stageScale,
-          this.circleNeedData.stage.width,
-          this.circleNeedData.stage.height
-        );
-
+        // touch scale不等于1 时，重新你计算组件UV
         const cx =
           (this.directions.cx - this.circleNeedData.stagePointerPosition.x) /
           this.circleNeedData.stageScale;
         const cy =
           (this.directions.cy - this.circleNeedData.stagePointerPosition.y) /
           this.circleNeedData.stageScale;
-        // const cx = pageX;
-        // const cy = pageY;
+        const curLayerUvX = (this.circleData.curLayerUvX = (
+          cx /
+          (this.circleNeedData.stage.width * this.circleNeedData.stageScale)
+        ).toFixed(6));
+        const curLayerUvY = (this.circleData.curLayerUvY = (
+          cy /
+          (this.circleNeedData.stage.height * this.circleNeedData.stageScale)
+        ).toFixed(6));
         point = {
           location: {
             omega: this.form.omega,
-            x: (
-              cx /
-              (this.circleNeedData.stage.width * this.circleNeedData.stageScale)
-            ).toFixed(6),
-            y: (
-              cy /
-              (this.circleNeedData.stage.height *
-                this.circleNeedData.stageScale)
-            ).toFixed(6),
+            x: curLayerUvX,
+            y: curLayerUvY,
           },
           process: this.form.selectPoint.process,
           station: this.form.selectPoint.station,
         };
-        this.directions = {
-          cx,
-          cy,
-        };
+        this.directions = { cx, cy };
       }
 
-      this.$emit("saveCircleTooltipData", {
+      return {
         triggerPoint: point,
         directions: this.directions,
         visible: false,
-      });
-      this.isContent = false;
+      };
     },
 
     // 操作form 函数
@@ -545,6 +519,8 @@ export default {
 };
 </script>
 <style lang="scss" scoped>
+// @import "@/assets/style/index.scss";
+
 .el-form {
   width: 250px;
 
