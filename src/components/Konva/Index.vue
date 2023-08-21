@@ -935,7 +935,12 @@ export default {
               this.points.set(this.konvaConfig.points.length, point);
               this.selectArrowId = this.konvaConfig.points.length;
 
-              let item = { x: click.evt.layerX, y: click.evt.layerY, omega: 0 };
+              let item = {
+                x: click.evt.layerX,
+                y: click.evt.layerY,
+                omega: 0,
+                key: this.konvaConfig.points.length,
+              };
               this.konvaConfig.points.push(item);
             }
           }
@@ -973,7 +978,12 @@ export default {
             this.points.set(this.konvaConfig.points.length, point);
             this.selectArrowId = this.konvaConfig.points.length;
 
-            let item = { x: layerX, y: layerY, omega: 0 };
+            let item = {
+              x: layerX,
+              y: layerY,
+              omega: 0,
+              key: this.konvaConfig.points.length,
+            };
             this.konvaConfig.points.push(item);
           }
 
@@ -1181,6 +1191,7 @@ export default {
               x: layerX,
               y: layerY,
               omega: this.curLocationPosition.omega,
+              key: this.konvaConfig.points.length,
             };
             this.konvaConfig.points.push(item);
           }
@@ -1354,6 +1365,7 @@ export default {
                   x: layerX,
                   y: layerY,
                   omega: item.location.omega,
+                  key: this.konvaConfig.points.length,
                 };
                 this.konvaConfig.points.push(item1);
 
