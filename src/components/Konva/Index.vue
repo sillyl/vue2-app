@@ -374,6 +374,8 @@ export default {
         x: 0,
         y: 0,
       },
+      // 插入节点的最大数量（包括已删除的），这是个递增值
+      historyMaxnodeNum: 0,
     };
   },
   computed: {
@@ -481,7 +483,6 @@ export default {
       } = triggerPoint;
       const { cx, cy } = directions;
       this.visibleCircleTooltip = visible;
-      const curLen = this.points.size;
       const obj = getMinPoint(
         this.points,
         { x, y },
@@ -489,7 +490,6 @@ export default {
       );
 
       const obj1 = getObj1ByObj(this.konvaConfig.points, obj);
-      console.log("obj1", obj1, this.konvaConfig.points);
 
       let map = new Map();
       if (!isEmpty(obj)) {
@@ -503,8 +503,14 @@ export default {
         });
         console.log("iii", this.konvaConfig.points);
       } else {
-        map = this.points.set(curLen, triggerPoint);
-        this.konvaConfig.points.push({ x: cx, y: cy, omega, key: curLen });
+        map = this.points.set(this.historyMaxnodeNum, triggerPoint);
+        this.konvaConfig.points.push({
+          x: cx,
+          y: cy,
+          omega,
+          key: this.historyMaxnodeNum,
+        });
+        this.historyMaxnodeNum += 1;
       }
       console.log("oooooooooo", map);
 
