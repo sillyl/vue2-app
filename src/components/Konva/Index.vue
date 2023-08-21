@@ -285,6 +285,7 @@ import {
   getMinPoint,
   getCenter,
   getDistance,
+  getObj1ByObj,
 } from "@/utils/CoordinatePickupFun.js";
 import { isEmpty } from "lodash";
 let clickNum = 0;
@@ -437,19 +438,17 @@ export default {
       } = triggerPoint;
       const { cx, cy } = directions;
       this.visibleCircleTooltip = visible;
-      const obj = getMinPoint(this.points, { x, y }, this.threshold);
-      const stageThreshold =
-        this.threshold * (this.konvaConfig.stage.width * this.stageScale);
-      const obj1 = getMinPoint(
-        this.konvaConfig.points,
-        { x: cx, y: cy },
-        stageThreshold
+      const obj = getMinPoint(
+        this.points,
+        { x, y },
+        this.threshold / this.stageScale
       );
+      const obj1 = getObj1ByObj(this.konvaConfig.points, obj);
       if (!isEmpty(obj)) {
         this.points.delete(obj.key);
         let newPolyline = [];
         this.konvaConfig.points = this.konvaConfig.points.map((i) => {
-          if (i.x === obj1.x) {
+          if (i.key === obj1.key) {
             return;
           } else {
             return { ...i };
@@ -483,28 +482,31 @@ export default {
       const { cx, cy } = directions;
       this.visibleCircleTooltip = visible;
       const curLen = this.points.size;
-      const obj = getMinPoint(this.points, { x, y }, this.threshold);
-      const stageThreshold =
-        this.threshold * (this.konvaConfig.stage.width * this.stageScale);
-      const obj1 = getMinPoint(
-        this.konvaConfig.points,
-        { x: cx, y: cy },
-        stageThreshold
+      const obj = getMinPoint(
+        this.points,
+        { x, y },
+        this.threshold / this.stageScale
       );
+
+      const obj1 = getObj1ByObj(this.konvaConfig.points, obj);
+      console.log("obj1", obj1, this.konvaConfig.points);
+
       let map = new Map();
       if (!isEmpty(obj)) {
         map = this.points.set(obj.key, triggerPoint);
         this.konvaConfig.points = this.konvaConfig.points.map((i) => {
-          if (i.x === obj1.x) {
+          if (i.key === obj1.key) {
             return { ...i, omega };
           } else {
             return { ...i };
           }
         });
+        console.log("iii", this.konvaConfig.points);
       } else {
         map = this.points.set(curLen, triggerPoint);
-        this.konvaConfig.points.push({ x: cx, y: cy, omega });
+        this.konvaConfig.points.push({ x: cx, y: cy, omega, key: curLen });
       }
+      console.log("oooooooooo", map);
 
       this.points = map;
       let pointArr = [];

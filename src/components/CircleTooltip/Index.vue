@@ -344,7 +344,7 @@ export default {
       const res = getMinPoint(
         this.circleNeedData.points,
         { x: this.circleData.curLayerUvX, y: this.circleData.curLayerUvY },
-        this.threshold
+        this.threshold / this.circleNeedData.stageScale
       );
       this.updateFormData(res);
       (document.onmousemove = (el) => {
@@ -376,7 +376,7 @@ export default {
       const res = getMinPoint(
         this.circleNeedData.points,
         { x: this.circleData.curLayerUvX, y: this.circleData.curLayerUvY },
-        this.threshold
+        this.threshold / this.circleNeedData.stageScale
       );
       console.log(
         "onTouchstart",
