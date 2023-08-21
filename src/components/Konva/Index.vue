@@ -437,13 +437,14 @@ export default {
       } = triggerPoint;
       const { cx, cy } = directions;
       this.visibleCircleTooltip = visible;
-      const obj = getMinPoint(this.points, { x, y }, this.threshold);
       const stageThreshold = this.threshold * this.konvaConfig.stage.width;
       const obj1 = getMinPoint(
         this.konvaConfig.points,
         { x: cx, y: cy },
         stageThreshold
       );
+
+      const obj = obj1 ? this.points.get(obj1.key) : {};
       if (!isEmpty(obj1) || !isEmpty(obj1)) {
         this.points.delete(obj.key);
         let newPolyline = [];
@@ -481,13 +482,14 @@ export default {
       const { cx, cy } = directions;
       this.visibleCircleTooltip = visible;
       const curLen = this.points.size;
-      const obj = getMinPoint(this.points, { x, y }, this.threshold);
       const stageThreshold = this.threshold * this.konvaConfig.stage.width;
       const obj1 = getMinPoint(
         this.konvaConfig.points,
         { x: cx, y: cy },
         stageThreshold
       );
+
+      const obj = obj1 ? this.points.get(obj1.key) : {};
       let map = new Map();
       if (!isEmpty(obj)) {
         map = this.points.set(obj.key, triggerPoint);
@@ -503,7 +505,7 @@ export default {
           }
         });
       } else {
-        this.konvaConfig.points.push({ x: cx, y: cy, omega });
+        this.konvaConfig.points.push({ x: cx, y: cy, omega, key: this.konvaConfig.points.length, });
       }
 
       this.points = map;
@@ -927,7 +929,7 @@ export default {
               this.points.set(this.konvaConfig.points.length, point);
               this.selectArrowId = this.konvaConfig.points.length;
 
-              let item = { x: click.evt.layerX, y: click.evt.layerY, omega: 0 };
+              let item = { x: click.evt.layerX, y: click.evt.layerY, omega: 0, key: this.konvaConfig.points.length, };
               this.konvaConfig.points.push(item);
             }
           }
@@ -965,7 +967,7 @@ export default {
             this.points.set(this.konvaConfig.points.length, point);
             this.selectArrowId = this.konvaConfig.points.length;
 
-            let item = { x: layerX, y: layerY, omega: 0 };
+            let item = { x: layerX, y: layerY, omega: 0 , key: this.konvaConfig.points.length,};
             this.konvaConfig.points.push(item);
           }
 
@@ -1173,6 +1175,7 @@ export default {
               x: layerX,
               y: layerY,
               omega: this.curLocationPosition.omega,
+              key: this.konvaConfig.points.length,
             };
             this.konvaConfig.points.push(item);
           }
@@ -1346,6 +1349,7 @@ export default {
                   x: layerX,
                   y: layerY,
                   omega: item.location.omega,
+                  key: this.konvaConfig.points.length,
                 };
                 this.konvaConfig.points.push(item1);
 
