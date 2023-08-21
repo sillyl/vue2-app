@@ -438,13 +438,14 @@ export default {
       const { cx, cy } = directions;
       this.visibleCircleTooltip = visible;
       const obj = getMinPoint(this.points, { x, y }, this.threshold);
-      const stageThreshold = this.threshold * this.konvaConfig.stage.width;
+      const stageThreshold =
+        this.threshold * (this.konvaConfig.stage.width * this.stageScale);
       const obj1 = getMinPoint(
         this.konvaConfig.points,
         { x: cx, y: cy },
         stageThreshold
       );
-      if (!isEmpty(obj1) || !isEmpty(obj1)) {
+      if (!isEmpty(obj)) {
         this.points.delete(obj.key);
         let newPolyline = [];
         this.konvaConfig.points = this.konvaConfig.points.map((i) => {
@@ -472,6 +473,7 @@ export default {
         ];
         this.konvaConfig.polyline = newPolyline;
       }
+      console.log("delete", this.selectPoint);
     },
     saveCircleTooltipData: function (data) {
       const { directions, triggerPoint, visible } = data;
@@ -482,7 +484,8 @@ export default {
       this.visibleCircleTooltip = visible;
       const curLen = this.points.size;
       const obj = getMinPoint(this.points, { x, y }, this.threshold);
-      const stageThreshold = this.threshold * this.konvaConfig.stage.width;
+      const stageThreshold =
+        this.threshold * (this.konvaConfig.stage.width * this.stageScale);
       const obj1 = getMinPoint(
         this.konvaConfig.points,
         { x: cx, y: cy },
@@ -491,10 +494,6 @@ export default {
       let map = new Map();
       if (!isEmpty(obj)) {
         map = this.points.set(obj.key, triggerPoint);
-      } else {
-        map = this.points.set(curLen, triggerPoint);
-      }
-      if (!isEmpty(obj1)) {
         this.konvaConfig.points = this.konvaConfig.points.map((i) => {
           if (i.x === obj1.x) {
             return { ...i, omega };
@@ -503,6 +502,7 @@ export default {
           }
         });
       } else {
+        map = this.points.set(curLen, triggerPoint);
         this.konvaConfig.points.push({ x: cx, y: cy, omega });
       }
 
