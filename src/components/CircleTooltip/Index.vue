@@ -146,7 +146,7 @@
           </el-form-item>
           <el-form-item>
             <el-button @click="onDelete">删除</el-button>
-            <el-button type="primary" @click="onSubmit">保存</el-button>
+            <el-button type="primary" @click="onSave">保存</el-button>
           </el-form-item>
         </el-form>
       </div>
@@ -237,8 +237,6 @@ export default {
           const Len1 = 33.6 / 2;
           this.top = layerY - Len1;
           this.left = layerX - Len1;
-          this.contentTop = this.top;
-          this.contentLeft = this.left;
           this.directions.cx = layerX;
           this.directions.cy = layerY;
           this.circleData.curLayerUvX = (
@@ -266,13 +264,52 @@ export default {
             this.left = this.directions.cx - 33.6 / 2;
             this.contentTop = this.top;
             this.contentLeft = this.left;
+            // this.circleData.curLayerUvX = (
+            //   this.directions.cx / this.circleNeedData.stage.width
+            // ).toFixed(6);
+            // this.circleData.curLayerUvY = (
+            //   this.directions.cy / this.circleNeedData.stage.height
+            // ).toFixed(6);
+            // console.log(
+            //   "updated0000",
+            //   this.circleData.curLayerUvX,
+            //   this.circleData.curLayerUvY
+            // );
+
+            // if (
+            //   this.circleNeedData.stageScale &&
+            //   this.circleNeedData.stagePointerPosition
+            // ) {
+            // touch scale不等于1 时，重新你计算组件UV
+            const cx =
+              (this.directions.cx -
+                this.circleNeedData.stagePointerPosition.x) /
+              1;
+            // this.directions.cx = cx;÷
+            const cy =
+              (this.directions.cy -
+                this.circleNeedData.stagePointerPosition.y) /
+              1;
+            // console.log("cxupdate", cx, cy, this.circleNeedData.stageScale);
+            // this.directions.cy = cy;
             this.circleData.curLayerUvX = (
-              this.directions.cx / this.circleNeedData.stage.width
+              cx /
+              (this.circleNeedData.stage.width * this.circleNeedData.stageScale)
             ).toFixed(6);
             this.circleData.curLayerUvY = (
-              this.directions.cy / this.circleNeedData.stage.height
+              cy /
+              (this.circleNeedData.stage.height *
+                this.circleNeedData.stageScale)
             ).toFixed(6);
+            // this.directions = { cx, cy };
+            console.log(
+              "updated111",
+              this.circleData.curLayerUvX,
+              this.circleData.curLayerUvY,
+              this.circleNeedData.stageScale
+            );
           }
+          // }
         } else {
           const Len2 = 80 / 2;
           this.contentTop = this.directions.cy - Len2;
@@ -304,11 +341,19 @@ export default {
   methods: {
     onCircleMousedown: function () {
       // 点击已存在坐标显示已存在坐标相关数据
+      console.log(
+        "22222",
+        this.circleData.curLayerUvX,
+        this.circleData.curLayerUvY,
+        this.circleNeedData.points
+      );
       const res = getMinPoint(
         this.circleNeedData.points,
         { x: this.circleData.curLayerUvX, y: this.circleData.curLayerUvY },
         this.threshold
       );
+      console.log("res", res);
+
       this.updateFormData(res);
       (document.onmousemove = (el) => {
         this.isMounseMove = true;
@@ -340,6 +385,13 @@ export default {
         x: this.circleData.curLayerUvX,
         y: this.circleData.curLayerUvY,
       });
+      console.log(
+        "this.circleNeedData.points",
+        this.circleNeedData.points,
+        this.circleData.curLayerUvX,
+        this.circleData.curLayerUvY
+      );
+
       this.updateFormData(res);
     },
     onTouchmove: function (e) {
@@ -412,87 +464,67 @@ export default {
         process: [],
         station: [],
       };
-      const point = {
-        location: {
-          omega: this.form.omega,
-          x: this.circleData.curLayerUvX,
-          y: this.circleData.curLayerUvY,
-        },
-        process: this.form.selectPoint.process,
-        station: this.form.selectPoint.station,
-      };
-      this.$emit("deleteCircleTooltipData", {
-        triggerPoint: point,
-        directions: this.directions,
-        visible: false,
-      });
+      const obj = this.processScaleData();
+      this.$emit("deleteCircleTooltipData", obj);
     },
-    onSubmit() {
+    onSave() {
       // 传递父组件需要数据
+      const obj = this.processScaleData();
+      this.$emit("saveCircleTooltipData", obj);
+      this.isContent = false;
+    },
+
+    processScaleData: function () {
       let point = {
         location: {
           omega: this.form.omega,
           x: this.circleData.curLayerUvX,
           y: this.circleData.curLayerUvY,
+          insertScale: 1.0,
         },
         process: this.form.selectPoint.process,
         station: this.form.selectPoint.station,
       };
-
+      // 缩放比存在时 重新更新坐标位置
       if (
         this.circleNeedData.stageScale &&
         this.circleNeedData.stagePointerPosition
       ) {
-        const { pageX, pageY, layerX, layerY, clientX, clientY } =
-          this.triggerPosition;
-        const dom = document.getElementById(this.parentId);
-        console.log(
-          "dd",
-          this.directions.cx,
-          dom.offsetLeft,
-          dom.scrollLeft,
-          this.circleNeedData.stagePointerPosition.x,
-          this.circleNeedData.stageScale,
-          this.circleNeedData.stage.width,
-          this.circleNeedData.stage.height
-        );
-
+        // touch scale不等于1 时，重新你计算组件UV
         const cx =
           (this.directions.cx - this.circleNeedData.stagePointerPosition.x) /
           this.circleNeedData.stageScale;
         const cy =
           (this.directions.cy - this.circleNeedData.stagePointerPosition.y) /
           this.circleNeedData.stageScale;
-        // const cx = pageX;
-        // const cy = pageY;
+        const curLayerUvX = (this.circleData.curLayerUvX = (
+          cx /
+          (this.circleNeedData.stage.width * this.circleNeedData.stageScale)
+        ).toFixed(6));
+        const curLayerUvY = (this.circleData.curLayerUvY = (
+          cy /
+          (this.circleNeedData.stage.height * this.circleNeedData.stageScale)
+        ).toFixed(6));
+        console.log("3333", curLayerUvX, curLayerUvY);
+
         point = {
           location: {
             omega: this.form.omega,
-            x: (
-              cx /
-              (this.circleNeedData.stage.width * this.circleNeedData.stageScale)
-            ).toFixed(6),
-            y: (
-              cy /
-              (this.circleNeedData.stage.height *
-                this.circleNeedData.stageScale)
-            ).toFixed(6),
+            x: this.circleData.curLayerUvX,
+            y: this.circleData.curLayerUvY,
+            insertScale: this.circleNeedData.stageScale,
           },
           process: this.form.selectPoint.process,
           station: this.form.selectPoint.station,
         };
-        this.directions = {
-          cx,
-          cy,
-        };
+        this.directions = { cx, cy };
       }
 
-      this.$emit("saveCircleTooltipData", {
+      return {
         triggerPoint: point,
         directions: this.directions,
         visible: false,
-      });
-      this.isContent = false;
+      };
     },
 
     // 操作form 函数
@@ -545,6 +577,8 @@ export default {
 };
 </script>
 <style lang="scss" scoped>
+// @import "@/assets/style/index.scss";
+
 .el-form {
   width: 250px;
 

@@ -1,9 +1,12 @@
-import { axiosWarpInstance } from '@/utils/axiosInstance.js';
+import { axiosWarpInstance } from "@/utils/axiosInstance.js";
 
 export const getUserDeviceList = async (data) => {
-  const res = await axiosWarpInstance('url', data, { type: 'get', apiLoading: true });
+  const res = await axiosWarpInstance("url", data, {
+    type: "get",
+    apiLoading: true,
+  });
   return res;
-}
+};
 
 export function getMapAllList() {
   return {

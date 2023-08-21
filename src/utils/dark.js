@@ -1,5 +1,4 @@
-/* eslint-disable prettier/prettier */
-export function toDark (dark) {
+export function toDark(dark) {
   if (dark) {
     if (!document.getElementById("dark-style")) {
       const style = `

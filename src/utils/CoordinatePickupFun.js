@@ -18,8 +18,10 @@ export const getMinPoint = function (arr, curPoint, threshold) {
       // 数组
       const curPointX = i.x;
       const curPointY = i.y;
+      const insertscale = i.insertscale ? i.insertscale : 1;
       const len = Math.sqrt(
-        Math.pow(y - curPointY, 2) + Math.pow(x - curPointX, 2)
+        Math.pow(y / insertscale - curPointY, 2) +
+          Math.pow(x / insertscale - curPointX, 2)
       );
       if (len <= minLen) {
         minLen = len;
@@ -32,8 +34,12 @@ export const getMinPoint = function (arr, curPoint, threshold) {
       // new Map()
       const curPointX = val.location.x;
       const curPointY = val.location.y;
+      const insertScale = val.location.insertScale
+        ? val.location.insertScale
+        : 1;
       const len = Math.sqrt(
-        Math.pow(y - curPointY, 2) + Math.pow(x - curPointX, 2)
+        Math.pow(y / insertScale - curPointY, 2) +
+          Math.pow(x / insertScale - curPointX, 2)
       );
       if (len <= minLen) {
         minLen = len;
