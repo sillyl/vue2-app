@@ -198,11 +198,15 @@ export default {
         cy: 60,
         omega: 0,
       },
-      form: this.circleNeedData.form || {
-        omega: 0,
-        identifierList: [], // 目标物
-        metaTaskList: [], // 动作
-        selectPoint: { location: { omega: 0 }, process: [], station: [] }, // 选择点
+      form: {
+        omega: this.circleNeedData.form.omega || 0,
+        identifierList: this.circleNeedData.form.identifierList || [], // 目标物
+        metaTaskList: this.circleNeedData.form.metaTaskList || [], // 动作
+        selectPoint: this.circleNeedData.form.selectPoint || {
+          location: { omega: 0 },
+          process: [],
+          station: [],
+        }, // 选择点
       },
       // content 动态位置
       content: {
@@ -216,6 +220,8 @@ export default {
       const res = isEqual(newVal, oldVal);
       if (!this.circleNeedData.isTouchmoveing) {
         this.isContent = res;
+      } else {
+        this.isContent = false;
       }
       return !res;
     },
@@ -229,6 +235,16 @@ export default {
   updated() {
     const dom = document.getElementById(this.parentId);
     const dom1 = document.getElementById("content");
+    console.log("visible && !isContent", this.visible, this.isContent);
+
+    const stagePointerPositionX =
+      (this.circleNeedData.stagePointerPosition &&
+        this.circleNeedData.stagePointerPosition.x) ||
+      0;
+    const stagePointerPositionY =
+      (this.circleNeedData.stagePointerPosition &&
+        this.circleNeedData.stagePointerPosition.y) ||
+      0;
     if (!this.circleNeedData.isTouchStart) {
       if (!this.isMounseMove) {
         if (!this.isContent) {
@@ -239,11 +255,15 @@ export default {
           this.left = layerX - Len1;
           this.directions.cx = layerX;
           this.directions.cy = layerY;
+          const cx = (this.directions.cx - stagePointerPositionX) / 1;
+          const cy = (this.directions.cy - stagePointerPositionY) / 1;
           this.circleData.curLayerUvX = (
-            layerX / this.circleNeedData.stage.width
+            cx /
+            (this.circleNeedData.stage.width * this.circleNeedData.stageScale)
           ).toFixed(6);
           this.circleData.curLayerUvY = (
-            layerY / this.circleNeedData.stage.height
+            cy /
+            (this.circleNeedData.stage.height * this.circleNeedData.stageScale)
           ).toFixed(6);
         } else {
           //确保move 圆之后 content 展示位置不偏移
@@ -258,40 +278,17 @@ export default {
         // touch 事件拿到的位置都是相遇于视口的，对于top 和 left 需要处理偏移量和滚动距离
         if (!this.isContent) {
           if (pageX) {
+            // console.log('updated', dom.offsetLeft, dom.scrollLeft, stagePointerPositionX, this.circleNeedData.stageScale);
             this.directions.cx = pageX - dom.offsetLeft + dom.scrollLeft;
             this.directions.cy = pageY - dom.offsetTop + dom.scrollTop;
             this.top = this.directions.cy - 33.6 / 2;
             this.left = this.directions.cx - 33.6 / 2;
             this.contentTop = this.top;
             this.contentLeft = this.left;
-            // this.circleData.curLayerUvX = (
-            //   this.directions.cx / this.circleNeedData.stage.width
-            // ).toFixed(6);
-            // this.circleData.curLayerUvY = (
-            //   this.directions.cy / this.circleNeedData.stage.height
-            // ).toFixed(6);
-            // console.log(
-            //   "updated0000",
-            //   this.circleData.curLayerUvX,
-            //   this.circleData.curLayerUvY
-            // );
+            const cx = (this.directions.cx - stagePointerPositionX) / 1.0;
+            const cy = (this.directions.cy - stagePointerPositionY) / 1.0;
+            // console.log('cx', cx, cy);
 
-            // if (
-            //   this.circleNeedData.stageScale &&
-            //   this.circleNeedData.stagePointerPosition
-            // ) {
-            // touch scale不等于1 时，重新你计算组件UV
-            const cx =
-              (this.directions.cx -
-                this.circleNeedData.stagePointerPosition.x) /
-              1;
-            // this.directions.cx = cx;÷
-            const cy =
-              (this.directions.cy -
-                this.circleNeedData.stagePointerPosition.y) /
-              1;
-            // console.log("cxupdate", cx, cy, this.circleNeedData.stageScale);
-            // this.directions.cy = cy;
             this.circleData.curLayerUvX = (
               cx /
               (this.circleNeedData.stage.width * this.circleNeedData.stageScale)
@@ -301,15 +298,7 @@ export default {
               (this.circleNeedData.stage.height *
                 this.circleNeedData.stageScale)
             ).toFixed(6);
-            // this.directions = { cx, cy };
-            console.log(
-              "updated111",
-              this.circleData.curLayerUvX,
-              this.circleData.curLayerUvY,
-              this.circleNeedData.stageScale
-            );
           }
-          // }
         } else {
           const Len2 = 80 / 2;
           this.contentTop = this.directions.cy - Len2;
@@ -317,6 +306,17 @@ export default {
         }
       }
     }
+    console.log(
+      "updated",
+      this.circleData.curLayerUvX,
+      this.circleData.curLayerUvY,
+      "otherssssss",
+      this.directions.cx,
+      stagePointerPositionX,
+      this.circleNeedData.stage.width,
+      this.circleNeedData.stageScale
+    );
+
     if (this.isContent) {
       //更新content 方位
       const domW = dom.clientWidth / 2;
@@ -341,19 +341,11 @@ export default {
   methods: {
     onCircleMousedown: function () {
       // 点击已存在坐标显示已存在坐标相关数据
-      console.log(
-        "22222",
-        this.circleData.curLayerUvX,
-        this.circleData.curLayerUvY,
-        this.circleNeedData.points
-      );
       const res = getMinPoint(
         this.circleNeedData.points,
         { x: this.circleData.curLayerUvX, y: this.circleData.curLayerUvY },
-        this.threshold
+        this.threshold / this.circleNeedData.stageScale
       );
-      console.log("res", res);
-
       this.updateFormData(res);
       (document.onmousemove = (el) => {
         this.isMounseMove = true;
@@ -381,15 +373,17 @@ export default {
     },
     onTouchstart: function () {
       // 点击已存在坐标显示已存在坐标相关数据
-      const res = getMinPoint(this.circleNeedData.points, {
-        x: this.circleData.curLayerUvX,
-        y: this.circleData.curLayerUvY,
-      });
-      console.log(
-        "this.circleNeedData.points",
+      const res = getMinPoint(
         this.circleNeedData.points,
+        { x: this.circleData.curLayerUvX, y: this.circleData.curLayerUvY },
+        this.threshold / this.circleNeedData.stageScale
+      );
+      console.log(
+        "onTouchstart",
         this.circleData.curLayerUvX,
-        this.circleData.curLayerUvY
+        this.circleData.curLayerUvY,
+        res,
+        this.circleNeedData.points
       );
 
       this.updateFormData(res);
@@ -413,6 +407,7 @@ export default {
     },
     onTouchend: function () {
       this.isMounseMove = false;
+      this.isContentTouchstart = false;
     },
     ondbClick: function () {
       this.isContent = true;
@@ -475,50 +470,49 @@ export default {
     },
 
     processScaleData: function () {
-      let point = {
+      // let point = {
+      //   location: {
+      //     omega: this.form.omega,
+      //     x: this.circleData.curLayerUvX,
+      //     y: this.circleData.curLayerUvY,
+      //     insertScale: 1.0,
+      //   },
+      //   process: this.form.selectPoint.process,
+      //   station: this.form.selectPoint.station,
+      // };
+      // 缩放比存在时 重新更新坐标位置
+      // if (this.circleNeedData.stageScale && this.circleNeedData.stagePointerPosition) {
+      // touch scale不等于1 时，重新你计算组件UV
+      const cx =
+        (this.directions.cx - this.circleNeedData.stagePointerPosition.x) /
+        this.circleNeedData.stageScale;
+      const cy =
+        (this.directions.cy - this.circleNeedData.stagePointerPosition.y) /
+        this.circleNeedData.stageScale;
+      // this.circleData.curLayerUvX = (cx / (this.circleNeedData.stage.width * this.circleNeedData.stageScale)).toFixed(6);
+      // this.circleData.curLayerUvY = (cy / (this.circleNeedData.stage.height * this.circleNeedData.stageScale)).toFixed(6);
+
+      const point = {
         location: {
           omega: this.form.omega,
           x: this.circleData.curLayerUvX,
           y: this.circleData.curLayerUvY,
-          insertScale: 1.0,
+          insertScale: this.circleNeedData.stageScale,
         },
         process: this.form.selectPoint.process,
         station: this.form.selectPoint.station,
       };
-      // 缩放比存在时 重新更新坐标位置
-      if (
-        this.circleNeedData.stageScale &&
-        this.circleNeedData.stagePointerPosition
-      ) {
-        // touch scale不等于1 时，重新你计算组件UV
-        const cx =
-          (this.directions.cx - this.circleNeedData.stagePointerPosition.x) /
-          this.circleNeedData.stageScale;
-        const cy =
-          (this.directions.cy - this.circleNeedData.stagePointerPosition.y) /
-          this.circleNeedData.stageScale;
-        const curLayerUvX = (this.circleData.curLayerUvX = (
-          cx /
-          (this.circleNeedData.stage.width * this.circleNeedData.stageScale)
-        ).toFixed(6));
-        const curLayerUvY = (this.circleData.curLayerUvY = (
-          cy /
-          (this.circleNeedData.stage.height * this.circleNeedData.stageScale)
-        ).toFixed(6));
-        console.log("3333", curLayerUvX, curLayerUvY);
-
-        point = {
-          location: {
-            omega: this.form.omega,
-            x: this.circleData.curLayerUvX,
-            y: this.circleData.curLayerUvY,
-            insertScale: this.circleNeedData.stageScale,
-          },
-          process: this.form.selectPoint.process,
-          station: this.form.selectPoint.station,
-        };
-        this.directions = { cx, cy };
-      }
+      this.directions.cx = cx;
+      this.directions.cy = cy;
+      // this.directions = { cx, cy };
+      // }
+      console.log(
+        "processScaleData",
+        point,
+        this.directions,
+        this.circleData.curLayerUvX,
+        this.circleData.curLayerUvY
+      );
 
       return {
         triggerPoint: point,
@@ -577,7 +571,7 @@ export default {
 };
 </script>
 <style lang="scss" scoped>
-// @import "@/assets/style/index.scss";
+@import "@/assets/css/common.scss";
 
 .el-form {
   width: 250px;
@@ -614,7 +608,7 @@ export default {
 
   .action-add,
   .el-icon-delete {
-    color: blue;
+    color: $primary-color;
   }
 
   .form-items-label {

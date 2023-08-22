@@ -1,3 +1,5 @@
+import { isEmpty } from "lodash";
+
 export function getFθ(A, B) {
   const angleA = Math.atan2(B.y - A.y, B.x - A.x);
   return (angleA * 180) / Math.PI;
@@ -6,6 +8,24 @@ export function getFθ(A, B) {
 export const judgmentType = (obj) => {
   const type = Object.prototype.toString.call(obj).slice(8, -1); // '[object xxx]' 取xxx
   return type;
+};
+
+export const getObj1ByObj = function (arr, obj) {
+  if (isEmpty(obj)) {
+    return {};
+  }
+  console.log("getObj1ByObj", arr, obj);
+  let obj1 = {};
+  for (var i = 0; i < arr.length; i++) {
+    const item = arr[i];
+    console.log("llll", item);
+    if (item.key == obj.key) {
+      obj1 = item;
+      break;
+    }
+  }
+  // console.log("obj1", obj1);
+  return obj1;
 };
 
 export const getMinPoint = function (arr, curPoint, threshold) {
@@ -18,12 +38,10 @@ export const getMinPoint = function (arr, curPoint, threshold) {
       // 数组
       const curPointX = i.x;
       const curPointY = i.y;
-      const insertscale = i.insertscale ? i.insertscale : 1;
       const len = Math.sqrt(
-        Math.pow(y / insertscale - curPointY, 2) +
-          Math.pow(x / insertscale - curPointX, 2)
+        Math.pow(y - curPointY, 2) + Math.pow(x - curPointX, 2)
       );
-      if (len <= minLen) {
+      if (len.toFixed(2) <= minLen) {
         minLen = len;
         obj = i;
       }
@@ -32,16 +50,13 @@ export const getMinPoint = function (arr, curPoint, threshold) {
     // type === 'Map'
     (arr || []).forEach((val, key) => {
       // new Map()
-      const curPointX = val.location.x;
-      const curPointY = val.location.y;
-      const insertScale = val.location.insertScale
-        ? val.location.insertScale
-        : 1;
+      const curPointX = Number(val.location.x);
+      const curPointY = Number(val.location.y);
       const len = Math.sqrt(
-        Math.pow(y / insertScale - curPointY, 2) +
-          Math.pow(x / insertScale - curPointX, 2)
+        Math.pow(y - curPointY, 2) + Math.pow(x - curPointX, 2)
       );
-      if (len <= minLen) {
+      console.log("len", len);
+      if (len.toFixed(2) <= minLen) {
         minLen = len;
         obj = { value: val, key, curPoint };
       }
