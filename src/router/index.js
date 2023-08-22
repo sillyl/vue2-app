@@ -37,6 +37,18 @@ const routes = [
     // component: () => import(/* webpackChunkName: "about" */ "@/components/Wfs/Index.vue"),
     component: () => import(/* webpackChunkName: "about" */ "@/views/Video/Index.vue"),
   },
+  {
+    path: "/cssTest",
+    name: "CssTest",
+    // component: () => import(/* webpackChunkName: "about" */ "@/components/Wfs/Index.vue"),
+    component: () => import(/* webpackChunkName: "about" */ "@/components/cssTest/Index.vue"),
+  },
+  {
+    path: "/buttonOptions",
+    name: "ButtonOptions",
+    // component: () => import(/* webpackChunkName: "about" */ "@/components/Wfs/Index.vue"),
+    component: () => import(/* webpackChunkName: "about" */ "@/components/ButtonOptions/Index.vue"),
+  },
   // {
   //   path: "/demo",
   //   name: "TreeTable",

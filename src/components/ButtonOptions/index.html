@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+
+    <title>canvas环形进度条</title>
+
+    <style>
+      body {
+        background-color: #000;
+
+        text-align: center;
+      }
+
+      .canvas1 {
+        margin-top: 100px;
+
+        display: inline-block;
+
+        background-color: #fff;
+      }
+    </style>
+  </head>
+
+  <body>
+    <canvas id="circle_process" class="canvas1"></canvas>
+
+    <script>
+      /*
+
+ 需求：环形、一周分为10个片段，根据进度去走的一个状态
+
+ 技术选型：canvas （挑战加熟悉）
+
+ 思路：
+
+ 01 首先中间的文字部分不用说，使用canvas的画文字。
+
+ 02 圆形是个规则图形，那么为了避免画不规则图形，我们可以用圆和矩形来重叠出效果。
+
+ a. 大的灰色背景圆
+
+ b. 小一圈的白色背景圆
+
+ c. 以同心圆的圆心为圆心，小圆为半径为半径复制画10个小的矩形
+
+ */
+
+      //初始化动画变量
+
+      var requestAnimationFrame =
+        window.requestAnimationFrame ||
+        window.msRequestAnimationFrame ||
+        window.mozRequestAnimationFrame ||
+        window.webkitRequestAnimationFrame;
+
+      var cancelAnimationFrame =
+        window.cancelAnimationFrame ||
+        window.msCancelAnimationFrame ||
+        window.mozCancelAnimationFrame ||
+        window.webkitCancelRequestAnimationFrame;
+
+      //初始化当前进度数
+
+      var curPercentCount = 0;
+
+      //获取canvas对象，设置画布大小
+
+      var oC = document.querySelector("#circle_process");
+
+      oC.width = 300;
+
+      oC.height = 300;
+
+      //获取canvas执行上下文
+
+      var ctx = oC.getContext("2d");
+
+      //定义小矩形的个数
+
+      var miniRectCount = 4;
+
+      //定义圆心位置
+
+      var cirCenter = {
+        x: oC.width / 2,
+
+        y: oC.height / 2,
+      };
+
+      //定义小矩形的大小rectSize
+
+      var rectSize = {
+        width: 0,
+
+        height: 0,
+      };
+
+      //圆对象构造函数
+
+      function Circle(center, radius) {
+        this.center = center;
+
+        this.radius = radius;
+      }
+
+      //小矩形对象构造函数
+
+      function MiniRect(length, width) {
+        this.length = length;
+
+        this.width = width;
+      }
+
+      //角度转换成弧度的函数
+
+      function d2a(angleInt) {
+        return (angleInt * Math.PI) / 180;
+      }
+
+      //百分比转换角度函数（这里减90因为arc0度是从右侧开始的）
+
+      function percentTurn(percentFloat) {
+        return (percentFloat * 360) / 100 - 90;
+      }
+
+      //画当前百分比扇形的方法
+
+      function drawFanForPercent(percentFloat) {
+        ctx.beginPath();
+
+        ctx.moveTo(cirCenter.x, cirCenter.y);
+        ctx.lineTo(oC.width / 2, (oC.height - baseCircle.radius * 2) / 2);
+
+        ctx.arc(
+          cirCenter.x,
+          cirCenter.y,
+          baseCircle.radius,
+          d2a(-90),
+          d2a(percentTurn(percentFloat))
+        );
+
+        ctx.fillStyle = "aqua";
+
+        ctx.fill();
+
+        ctx.closePath();
+      }
+
+      //画圆的函数
+
+      function drawArc(center, radius, start, end, type, color) {
+        start = start || 0;
+
+        end = end || 360;
+
+        ctx.beginPath();
+
+        ctx.arc(center.x, center.y, radius, d2a(start), d2a(end));
+
+        ctx.fillStyle = color;
+
+        ctx.strokeStyle = color;
+
+        if (!!type) {
+          type === "fill" && ctx.fill();
+
+          type === "stroke" && ctx.stroke();
+        }
+
+        ctx.closePath();
+      }
+
+      //画文字的函数
+
+      function drawPercentText(text, percentInt) {
+        ctx.beginPath();
+
+        ctx.fillStyle = "aqua";
+
+        ctx.font = "italic small-caps bold 40px Calibri";
+
+        ctx.textAlign = "center";
+
+        ctx.fillText(text, cirCenter.x, cirCenter.y - 18, 100);
+
+        ctx.closePath();
+
+        ctx.beginPath();
+
+        ctx.fillStyle = "aqua";
+
+        ctx.font = "italic small-caps bold 60px Calibri";
+
+        ctx.textAlign = "center";
+
+        ctx.fillText(percentInt + "%", cirCenter.x, cirCenter.y + 40, 100);
+
+        ctx.closePath();
+      }
+
+      //画小方块的方法
+
+      function drawMiniRect(startPoint, width, height, axisPoint, rotateAngle) {
+
+        ctx.save();
+
+        ctx.translate(axisPoint.x, axisPoint.y); /*画布平移到圆的中心*/
+
+        ctx.rotate(d2a(rotateAngle)); /*旋转*/
+
+        /*画*/
+
+        ctx.beginPath();
+
+        ctx.fillStyle = "#FFF";
+
+        ctx.fillRect(
+          startPoint.x,
+          startPoint.y,
+          rectSize.width,
+          rectSize.height
+        );
+
+        ctx.closePath();
+
+        ctx.restore();
+      }
+
+      //画整体
+
+      function draw(curPercent) {
+        //底部灰色圆
+
+        drawArc(
+          baseCircle.center,
+          baseCircle.radius,
+          null,
+          null,
+          "fill",
+          "#CCC"
+        );
+
+        //进度扇形
+
+        drawFanForPercent(curPercent);
+
+        //内部白色遮挡圆
+
+        drawArc(
+          innerCircle.center,
+          innerCircle.radius,
+          null,
+          null,
+          "fill",
+          "#FFF"
+        );
+
+        //画文字
+
+        drawPercentText("当前进度", curPercent);
+
+        //十个小的矩形
+
+        for (var i = 0; i < miniRectCount; i++) {
+          drawMiniRect(
+            startPoint,
+            rectSize.width,
+            rectSize.height,
+            cirCenter,
+            (i * 360) / miniRectCount
+          );
+        }
+      }
+
+      //实例化底圆和内圆
+
+      var baseCircle = new Circle(cirCenter, 130);
+
+      var innerCircle = new Circle(cirCenter, 100);
+
+      //设置rectSize数值
+
+      rectSize.width = 15;
+
+      rectSize.height = baseCircle.radius - innerCircle.radius + 5;
+
+      //由于平移到中心点之后画的位置是在画布外的，所以重新定义
+
+      var startPoint = {
+        x: -7.5,
+
+        y: -baseCircle.radius - 2,
+      };
+
+      //这里开定时去显示当前是百分之几的进度
+
+      var raf = null;
+
+      var percent = 0;
+
+      function actProcess(percentFloat) {
+        percentFloat = percentFloat || 100;
+
+        percent = Math.round(percentFloat);
+
+        console.log(percent);
+
+        curPercentCount++;
+
+        raf = requestAnimationFrame(function () {
+          actProcess(percentFloat);
+        });
+
+        draw(curPercentCount);
+
+        if (curPercentCount >= percent) {
+          cancelAnimationFrame(raf);
+
+          return;
+        }
+      }
+
+      actProcess(50);
+    </script>
+  </body>
+</html>
