@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+
+    <title>canvas环形进度条</title>
+
+    <style>
+      body {
+        text-align: center;
+      }
+
+      .canvas1 {
+        margin-top: 100px;
+
+        display: inline-block;
+
+        background-color: #fff;
+      }
+    </style>
+  </head>
+
+  <body>
+    <canvas id="canvas1" class="canvas1"></canvas>
+
+    <script type="text/javascript">
+      var canvas = document.getElementById("canvas1");
+      var ctx = canvas.getContext("2d");
+      var nums = [60, 90, 30, 50, 100, 30];
+      var scale = [0.3, 0.5, 0.6, 0.8, 0.4, 1];
+      var arrs = ["重疾", "意外", "养老", "医疗", "身故", "子女"];
+      var val = [300, 50, 220, 7, 1100, 65];
+      var colors1 = [
+        "rgba(139,113,205,.3)",
+        "rgba(237,209,1,.3)",
+        "rgba(0,124,226,.3)",
+        "rgba(1,162,217,.3)",
+        "rgba(80,194,135,.3)",
+        "rgba(242,171,48,.3)",
+      ];
+      var colors = [
+        "#8b71cd",
+        "#edd101",
+        "#007ce2",
+        "#01a2d9",
+        "#50c287",
+        "#f2ab4e",
+      ];
+      var width = canvas.clientWidth;
+      var height = canvas.clientHeight;
+      // 计算半径、圆心点，定义初始值start、end
+      var radius = height / 4;
+      var start = 0;
+      var end = 0;
+      var endDeg = 0;
+      var centerX = width / 2;
+      var centerY = height / 2;
+      var ctxArr = [];
+
+      //绘制圆饼 背景
+      function pieBg() {
+        for (var i = 0; i < nums.length; i++) {
+          ctx.beginPath();
+          ctx.moveTo(0, 0);
+          end += (nums[i] / 180) * Math.PI; //终止角度
+          ctx.fillStyle = colors1[i];
+          ctx.arc(0, 0, radius, start, end);
+          ctx.fill();
+          ctx.closePath();
+          start += (nums[i] / 180) * Math.PI; //起始角度
+        }
+      }
+      //重绘选中扇形
+      function redraw(index) {
+        for (var i = 0; i < nums.length; i++) {
+          ctx.beginPath();
+          ctx.moveTo(0, 0);
+          end += (nums[i] / 180) * Math.PI; //终止角度
+          if (index == i) {
+            ctx.fillStyle = "#ff9000";
+          } else {
+            ctx.fillStyle = colors[i];
+          }
+          ctx.arc(0, 0, radius * scale[i], start, end);
+          ctxArr.push({ key: i, startDeg: start, endDeg: end });
+          ctx.fill();
+          ctx.closePath();
+          start += (nums[i] / 180) * Math.PI; //起始角度
+        }
+      }
+
+      //实心圆
+      function draw() {
+        ctx.translate(centerX, centerY);
+        pieBg();
+        redraw();
+        pieLine();
+        console.log("圆心点x=" + centerX + "----y=" + centerY);
+
+        //添加扇形的点击事件
+        canvas.addEventListener(
+          "click",
+          function (e) {
+            //获取坐标点(x,y)
+            var x = event.pageX - canvas.getBoundingClientRect().left;
+            var y = event.pageY - canvas.getBoundingClientRect().top;
+            if (
+              Math.pow(x - centerX, 2) + Math.pow(y - centerY, 2) <
+                Math.pow(radius * scale[0], 2) &&
+              y > centerY &&
+              y - centerY < Math.tan(60 * (Math.PI / 180)) * (x - centerX)
+            ) {
+              console.log("在扇形1内");
+              redraw(0);
+            }
+            if (
+              Math.pow(x - centerX, 2) + Math.pow(y - centerY, 2) <
+                Math.pow(radius * scale[1], 2) &&
+              y - centerY > Math.tan(60 * (Math.PI / 180)) * (x - centerX) &&
+              y - centerY > Math.tan(150 * (Math.PI / 180)) * (x - centerX)
+            ) {
+              console.log("在扇形2内");
+              redraw(1);
+            }
+            if (
+              Math.pow(x - centerX, 2) + Math.pow(y - centerY, 2) <
+                Math.pow(radius * scale[2], 2) &&
+              y > centerY &&
+              y - centerY < Math.tan(150 * (Math.PI / 180)) * (x - centerX)
+            ) {
+              console.log("在扇形3内");
+              redraw(2);
+            }
+            if (
+              Math.pow(x - centerX, 2) + Math.pow(y - centerY, 2) <
+                Math.pow(radius * scale[3], 2) &&
+              y < centerY &&
+              y - centerY > Math.tan(50 * (Math.PI / 180)) * (x - centerX)
+            ) {
+              console.log("在扇形4内");
+              redraw(3);
+            }
+            if (
+              Math.pow(x - centerX, 2) + Math.pow(y - centerY, 2) <
+                Math.pow(radius * scale[4], 2) &&
+              y - centerY < Math.tan(50 * (Math.PI / 180)) * (x - centerX) &&
+              y - centerY < Math.tan(150 * (Math.PI / 180)) * (x - centerX)
+            ) {
+              console.log("在扇形5内");
+              redraw(4);
+            }
+            if (
+              Math.pow(x - centerX, 2) + Math.pow(y - centerY, 2) <
+                Math.pow(radius * scale[5], 2) &&
+              y < centerY &&
+              y - centerY > Math.tan(150 * (Math.PI / 180)) * (x - centerX)
+            ) {
+              console.log("在扇形6内");
+              redraw(5);
+            }
+          },
+          false
+        );
+      }
+      var endDeg = 0;
+      //指示线及文字说明
+      function pieLine() {
+        for (var i = 0; i < nums.length; i++) {
+          ctx.beginPath();
+          var x = radius * Math.cos(((endDeg + nums[i] / 2) / 180) * Math.PI);
+          var y = radius * Math.sin(((endDeg + nums[i] / 2) / 180) * Math.PI);
+          // console.log("x="+x+"--y="+y);
+          ctx.moveTo(x, y);
+          var x1 =
+            (radius + 20) * Math.cos(((endDeg + nums[i] / 2) / 180) * Math.PI);
+          var y1 =
+            (radius + 20) * Math.sin(((endDeg + nums[i] / 2) / 180) * Math.PI);
+          ctx.lineTo(x1, y1);
+          var x2 =
+            (radius + 20 + 20) *
+            Math.cos(((endDeg + nums[i] / 2) / 180) * Math.PI);
+          if (x1 > 0) {
+            x2 = x1 + 10;
+          } else {
+            x2 = x1 - 10;
+          }
+          ctx.lineTo(x2, y1);
+          ctx.stroke(); //描边
+          console.log(x2);
+          //指示文字
+          //计算文字宽度高度
+          ctx.font = "12px scans-serif";
+          ctx.fillStyle = "#333";
+          var w =
+            ctx.measureText(val[i] + "万").width >
+            ctx.measureText(arrs[i]).width
+              ? ctx.measureText(val[i] + "万").width
+              : ctx.measureText(arrs[i]).width;
+          if (x2 < 0) {
+            x2 = x2 - w;
+          }
+          ctx.fillText(arrs[i], x2, y1);
+          ctx.fillText(val[i] + "万", x2, y1 + 14);
+          endDeg += nums[i]; //起始角度
+        }
+      }
+      draw();
+    </script>
+  </body>
+</html>
