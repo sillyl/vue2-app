@@ -14,7 +14,6 @@ export const getObj1ByObj = function (arr, obj) {
   if (isEmpty(obj)) {
     return {};
   }
-  console.log("getObj1ByObj", arr, obj);
   let obj1 = {};
   for (var i = 0; i < arr.length; i++) {
     const item = arr[i];

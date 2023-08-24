@@ -3,14 +3,24 @@
 </template>
 <script>
 export default {
+  props: [
+    "num",
+    "canvasWidth",
+    "canvasHeight",
+    "isCore",
+    "centerR",
+    "clickFun",
+  ],
   data() {
     return {
-      canvasW: 200,
-      canvasH: 200,
-      isCoreMenu: true, // 是否展示中心按钮
-      roundRadius: 50, // 中心圆半径
-      radiusDistance: 3, //半径的长度比 （中心圆半径 = 大圆半径 * radiusDistance）
+      nums: this.num || 4,
+      canvasW: this.canvasWidth || 200,
+      canvasH: this.canvasHeight || 200,
+      roundRadius: this.centerR || 50, // 中心圆半径
       arrs: ["上", "下", "左", "右"],
+      clickCurX: 0,
+      clickCurY: 0,
+      childData: null, // 统一暴露子组件数据 给父组件点击计算使用
     };
   },
   mounted() {
@@ -20,29 +30,34 @@ export default {
     onDraw: function () {
       const arr = this.arrs;
       const canvas = document.querySelector("#ctx");
-      // canvas.style.border = "1px solid blue";
       const ctx = canvas.getContext("2d");
-      //圆弧的份数
-      const num = 4;
+      const num = this.nums; //圆弧的份数
       //一个圆弧对应的弧度
-      const angle = (Math.PI * 2) / num;
+      const rad = (Math.PI * 2) / num;
+      const radθ = rad * (180 / Math.PI);
       const coreX = this.canvasW / 2; // 圆心坐标
       const coreY = this.canvasH / 2;
-      const radiusM = this.canvasW / 2.1;
-      const roundRadius = coreX / 2.5;
+      const radiusM = this.canvasW / 2.1; // 扇形（大圆）半径
+      const roundRadius = coreX / 2.5; // 小圆半径
+      const θ = 360 / this.nums / 2; // 需要旋转多少角度
+      const radDiff = (Math.PI / 180) * θ;
       //随机颜色
-      let star = 0;
-      let end = angle;
+      let start = radDiff;
+      let end = rad + radDiff;
+      ctx.translate(coreX, coreY); // 将中心调整到圆心
       paintP();
-      paintCircle();
+      if (!this.isCore) {
+        // 不传默认展示
+        paintCircle();
+      }
 
       function paintP() {
         console.log("arr", arr);
         for (let i = 0; i < num; i++) {
           ctx.save();
           ctx.beginPath();
-          ctx.moveTo(coreX, coreY);
-          ctx.arc(coreX, coreY, radiusM, star, end);
+          ctx.moveTo(0, 0);
+          ctx.arc(0, 0, radiusM, start, end);
           ctx.closePath();
           ctx.fillStyle = "#ccc";
           ctx.font = "12px scans-serif";
@@ -50,13 +65,13 @@ export default {
           ctx.stroke();
           ctx.fill();
           ctx.restore();
-          star = end;
-          end = end + angle;
+          start = end;
+          end = end + rad;
         }
       }
       function paintCircle() {
         ctx.beginPath();
-        ctx.arc(coreX, coreY, roundRadius, 0, Math.PI * 2, true);
+        ctx.arc(0, 0, roundRadius, 0, Math.PI * 2, true);
         ctx.fillStyle = "#ccc";
         // ctx.fillText("中心", 140, 140);
         ctx.stroke();
@@ -68,11 +83,10 @@ export default {
         for (let i = 0; i < num; i++) {
           ctx.save();
           ctx.beginPath();
-          ctx.moveTo(coreX, coreY);
-          ctx.arc(coreX, coreY, radiusM, star, end);
+          ctx.moveTo(0, 0);
+          ctx.arc(0, 0, radiusM, start, end);
           ctx.closePath();
           if (index === i) {
-            console.log("i", i);
             ctx.fillStyle = "#ff9000";
           } else {
             ctx.fillStyle = "ccc";
@@ -81,8 +95,8 @@ export default {
           ctx.stroke();
           ctx.fill();
           ctx.restore();
-          star = end;
-          end = end + angle;
+          start = end;
+          end = end + rad;
         }
         paintCircle(); // 保证中心圆是是最后一个绘制（重要必须！！！）
       }
@@ -90,7 +104,7 @@ export default {
       function redrawPaintCircle() {
         ctx.save();
         ctx.beginPath();
-        ctx.arc(coreX, coreY, roundRadius, 0, Math.PI * 2, true);
+        ctx.arc(0, 0, roundRadius, 0, Math.PI * 2, true);
         ctx.stroke();
         ctx.fillStyle = "#ff9000";
         ctx.fill();
@@ -98,62 +112,40 @@ export default {
         ctx.restore();
       }
 
-      canvas.onclick = function (e) {
+      const that = this;
+      canvas.onclick = async function (e) {
         const event = e || event;
         const x = e.clientX - canvas.offsetLeft; //获取点击后x的坐标
         const y = e.clientY - canvas.offsetTop; //获取点击后y的坐标
+        that.clickCurX = x;
+        that.clickCurY = y;
         // const isTure = ctx.isPointInPath(x, y); // canvas事件中 该方法只会判断最后一层
-        const curClickPointR =
-          Math.pow(x - coreX, 2) + Math.pow(y - coreY, 2) <
-          Math.pow(radiusM, 2);
         const curR =
           Math.pow(x - coreX, 2) + Math.pow(y - coreY, 2) <
           Math.pow(roundRadius, 2);
         if (curR) {
           paintP();
-          redrawPaintCircle();
+          if (!this.isCore) {
+            // 不传默认展示
+            redrawPaintCircle();
+          }
           console.log("在中心圆中");
           return;
         }
-        if (
-          curClickPointR &&
-          y > coreY &&
-          y - coreY < Math.tan(angle * 1) * (x - coreX)
-        ) {
-          console.log("在扇形0内");
-          redrawPaintP(0);
-          return;
-        }
-        if (
-          curClickPointR &&
-          y - coreY > Math.tan(angle * 1) * (x - coreX) &&
-          y - coreY > Math.tan(angle * 2) * (x - coreX)
-        ) {
-          console.log("在扇形1内");
-          redrawPaintP(1);
-          return;
-        }
-        if (
-          curClickPointR &&
-          y < coreY &&
-          y - coreY < Math.tan(angle * 2) * (x - coreX) &&
-          y - coreY > Math.tan(angle * 3) * (x - coreX)
-        ) {
-          console.log("在扇形2内");
-          redrawPaintP(2);
-          return;
-        }
-        if (
-          curClickPointR &&
-          y < coreY &&
-          y - coreY < Math.tan(angle * 4) * (x - coreX)
-        ) {
-          console.log(
-            "在扇形3内",
-            y - coreY < Math.tan(angle * 4) * (x - coreX)
-          );
-          redrawPaintP(3);
-          return;
+        that.childData = {
+          x,
+          y,
+          coreX,
+          coreY,
+          radθ, // 等分角
+          θ, //旋转角，即开始画图的开始角
+          redrawPaintP,
+        };
+        const curClickPointR =
+          Math.pow(x - coreX, 2) + Math.pow(y - coreY, 2) <
+          Math.pow(radiusM, 2); // 确保点击在大圆内触发事件
+        if (that.clickFun && curClickPointR) {
+          that.clickFun();
         }
       };
     },

@@ -47,7 +47,7 @@ const routes = [
     path: "/buttonOptions",
     name: "ButtonOptions",
     // component: () => import(/* webpackChunkName: "about" */ "@/components/Wfs/Index.vue"),
-    component: () => import(/* webpackChunkName: "about" */ "@/components/ButtonOptions/Index.vue"),
+    component: () => import(/* webpackChunkName: "about" */ "@/components/ButtonOptions/Demo.vue"),
   },
   // {
   //   path: "/demo",
