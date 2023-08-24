@@ -88,7 +88,7 @@ export default {
 };
 </script>
 <style lang="scss" scoped>
-@import "@/assets/style/index.scss";
+@import "@/assets/css/common.scss";
 
 ::v-deep {
   .el-tree-node__content {

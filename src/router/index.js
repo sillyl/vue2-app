@@ -49,11 +49,11 @@ const routes = [
     // component: () => import(/* webpackChunkName: "about" */ "@/components/Wfs/Index.vue"),
     component: () => import(/* webpackChunkName: "about" */ "@/components/ButtonOptions/Demo.vue"),
   },
-  // {
-  //   path: "/demo",
-  //   name: "TreeTable",
-  //   component: () => import(/* webpackChunkName: "about" */ "@/components/TreeTable/demo.vue"),
-  // },
+  {
+    path: "/demo",
+    name: "TreeTable",
+    component: () => import(/* webpackChunkName: "about" */ "@/components/TreeTable/demo.vue"),
+  },
 ];
 
 const router = new VueRouter({

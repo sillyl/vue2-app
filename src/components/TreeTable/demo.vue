@@ -174,7 +174,7 @@ export default {
 };
 </script>
 <style lang="scss" scoped>
-@import "@/assets/style/index.scss";
+@import "@/assets/css/common.scss";
 
 .action-i {
   margin-left: 10px;
