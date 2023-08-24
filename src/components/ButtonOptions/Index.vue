@@ -2,6 +2,8 @@
   <canvas :width="canvasW" :height="canvasH" id="ctx"></canvas>
 </template>
 <script>
+// 该组件默认支持上下左右 中心方向，其余按此结构计算传值, 尤其是arr
+import { isEmpty } from "lodash";
 export default {
   props: [
     "num",
@@ -10,17 +12,24 @@ export default {
     "isCore",
     "centerR",
     "clickFun",
+    "arr",
+    "bgColor",
+    "clickBgColor",
+    "fontColor",
   ],
   data() {
     return {
       nums: this.num || 4,
-      canvasW: this.canvasWidth || 200,
-      canvasH: this.canvasHeight || 200,
+      canvasW: this.canvasWidth || 150,
+      canvasH: this.canvasHeight || 150,
       roundRadius: this.centerR || 50, // 中心圆半径
-      arrs: ["上", "下", "左", "右"],
+      arrs: this.arr,
       clickCurX: 0,
       clickCurY: 0,
       childData: null, // 统一暴露子组件数据 给父组件点击计算使用
+      bgCor: this.bgColor || "#D3D3D3",
+      clickBgCor: this.clickBgColor || "#87CEFA",
+      fontCor: this.fontColor || "#000000",
     };
   },
   mounted() {
@@ -28,7 +37,6 @@ export default {
   },
   methods: {
     onDraw: function () {
-      const arr = this.arrs;
       const canvas = document.querySelector("#ctx");
       const ctx = canvas.getContext("2d");
       const num = this.nums; //圆弧的份数
@@ -45,6 +53,17 @@ export default {
       let start = radDiff;
       let end = rad + radDiff;
       ctx.translate(coreX, coreY); // 将中心调整到圆心
+      const txtPostion = (coreX + roundRadius) / 2;
+      const that = this;
+      if (isEmpty(this.arrs)) {
+        this.arrs = [
+          { key: "下", x: 0, y: txtPostion },
+          { key: "左", x: -txtPostion, y: 0 },
+          { key: "上", x: 0, y: -txtPostion },
+          { key: "右", x: txtPostion, y: 0 },
+          "中心",
+        ];
+      }
       paintP();
       if (!this.isCore) {
         // 不传默认展示
@@ -52,18 +71,24 @@ export default {
       }
 
       function paintP() {
-        console.log("arr", arr);
         for (let i = 0; i < num; i++) {
+          const text = that.arrs[i].key;
+          const x = that.arrs[i].x;
+          const y = that.arrs[i].y;
           ctx.save();
           ctx.beginPath();
           ctx.moveTo(0, 0);
           ctx.arc(0, 0, radiusM, start, end);
-          ctx.closePath();
-          ctx.fillStyle = "#ccc";
-          ctx.font = "12px scans-serif";
-          // ctx.fillText(arr[i], 120, 120);
+          ctx.fillStyle = that.bgCor; // 填充整体背景颜色
           ctx.stroke();
           ctx.fill();
+          ctx.closePath();
+          ctx.beginPath();
+          ctx.textAlign = "center";
+          ctx.textBaseline = "middle";
+          ctx.font = "16px scans-serif";
+          ctx.fillStyle = that.fontCor; // 字体颜色
+          ctx.fillText(text, x, y);
           ctx.restore();
           start = end;
           end = end + rad;
@@ -72,28 +97,42 @@ export default {
       function paintCircle() {
         ctx.beginPath();
         ctx.arc(0, 0, roundRadius, 0, Math.PI * 2, true);
-        ctx.fillStyle = "#ccc";
-        // ctx.fillText("中心", 140, 140);
+        ctx.fillStyle = that.bgCor;
         ctx.stroke();
         ctx.fill();
         ctx.closePath();
+        ctx.beginPath();
+        ctx.font = "16px scans-serif";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillStyle = that.fontCor; // 字体颜色
+        ctx.fillText(that.arrs[that.arrs.length - 1], 0, 0);
+        ctx.restore();
       }
 
       function redrawPaintP(index) {
         for (let i = 0; i < num; i++) {
+          const text = that.arrs[i].key;
+          const x = that.arrs[i].x;
+          const y = that.arrs[i].y;
           ctx.save();
           ctx.beginPath();
           ctx.moveTo(0, 0);
           ctx.arc(0, 0, radiusM, start, end);
-          ctx.closePath();
           if (index === i) {
-            ctx.fillStyle = "#ff9000";
+            ctx.fillStyle = that.clickBgCor;
           } else {
-            ctx.fillStyle = "ccc";
+            ctx.fillStyle = that.bgCor;
           }
-          ctx.font = "12px scans-serif";
           ctx.stroke();
           ctx.fill();
+          ctx.closePath(); // 上一个形成闭合，否则影响下一个开始
+          ctx.beginPath();
+          ctx.textAlign = "center";
+          ctx.textBaseline = "middle";
+          ctx.font = "16px scans-serif";
+          ctx.fillStyle = that.fontCor; // 字体颜色
+          ctx.fillText(text, x, y);
           ctx.restore();
           start = end;
           end = end + rad;
@@ -106,13 +145,18 @@ export default {
         ctx.beginPath();
         ctx.arc(0, 0, roundRadius, 0, Math.PI * 2, true);
         ctx.stroke();
-        ctx.fillStyle = "#ff9000";
+        ctx.fillStyle = that.clickBgCor;
         ctx.fill();
         ctx.closePath();
+        ctx.beginPath();
+        ctx.font = "16px scans-serif";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillStyle = that.fontCor; // 字体颜色
+        ctx.fillText(that.arrs[that.arrs.length - 1], 0, 0);
         ctx.restore();
       }
 
-      const that = this;
       canvas.onclick = async function (e) {
         const event = e || event;
         const x = e.clientX - canvas.offsetLeft; //获取点击后x的坐标
@@ -120,18 +164,6 @@ export default {
         that.clickCurX = x;
         that.clickCurY = y;
         // const isTure = ctx.isPointInPath(x, y); // canvas事件中 该方法只会判断最后一层
-        const curR =
-          Math.pow(x - coreX, 2) + Math.pow(y - coreY, 2) <
-          Math.pow(roundRadius, 2);
-        if (curR) {
-          paintP();
-          if (!this.isCore) {
-            // 不传默认展示
-            redrawPaintCircle();
-          }
-          console.log("在中心圆中");
-          return;
-        }
         that.childData = {
           x,
           y,
@@ -140,11 +172,12 @@ export default {
           radθ, // 等分角
           θ, //旋转角，即开始画图的开始角
           redrawPaintP,
+          radiusM,
+          roundRadius,
+          paintP,
+          redrawPaintCircle,
         };
-        const curClickPointR =
-          Math.pow(x - coreX, 2) + Math.pow(y - coreY, 2) <
-          Math.pow(radiusM, 2); // 确保点击在大圆内触发事件
-        if (that.clickFun && curClickPointR) {
+        if (that.clickFun) {
           that.clickFun();
         }
       };
