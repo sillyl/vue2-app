@@ -92,15 +92,13 @@ export default {
 
 ::v-deep {
   .el-tree-node__content {
-    width: 100%;
+    // width: 100%;
+    display: inherit;
     height: auto;
   }
 }
 
 .custom-tree-node {
-  display: flex;
-  justify-content: center;
-  align-items: center;
   width: inherit;
   font-size: 14px;
   padding-right: 8px;
