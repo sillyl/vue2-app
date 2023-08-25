@@ -54,6 +54,20 @@ const routes = [
     name: "TreeTable",
     component: () => import(/* webpackChunkName: "about" */ "@/components/TreeTable/demo.vue"),
   },
+  {
+    path: '/notFound',
+    name: 'NotFound',
+    meta: {
+      title: 'Page not found',
+      isLogin: false
+    },
+    component: () => import(/* webpackChunkName: "NotFound" */ '@/components/NotFound/Index.vue')
+  },
+  // 所有未定义路由，全部重定向到notFound页
+  {
+    path: '*',
+    redirect: '/notFound'
+  }
 ];
 
 const router = new VueRouter({
