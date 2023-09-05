@@ -1,5 +1,4 @@
 import { isEmpty } from "lodash";
-
 export function getFθ(A, B) {
   const angleA = Math.atan2(B.y - A.y, B.x - A.x);
   return (angleA * 180) / Math.PI;
@@ -8,23 +7,6 @@ export function getFθ(A, B) {
 export const judgmentType = (obj) => {
   const type = Object.prototype.toString.call(obj).slice(8, -1); // '[object xxx]' 取xxx
   return type;
-};
-
-export const getObj1ByObj = function (arr, obj) {
-  if (isEmpty(obj)) {
-    return {};
-  }
-  let obj1 = {};
-  for (var i = 0; i < arr.length; i++) {
-    const item = arr[i];
-    console.log("llll", item);
-    if (item.key == obj.key) {
-      obj1 = item;
-      break;
-    }
-  }
-  // console.log("obj1", obj1);
-  return obj1;
 };
 
 export const getMinPoint = function (arr, curPoint, threshold) {
@@ -54,7 +36,6 @@ export const getMinPoint = function (arr, curPoint, threshold) {
       const len = Math.sqrt(
         Math.pow(y - curPointY, 2) + Math.pow(x - curPointX, 2)
       );
-      console.log("len", len);
       if (len.toFixed(2) <= minLen) {
         minLen = len;
         obj = { value: val, key, curPoint };
@@ -64,6 +45,19 @@ export const getMinPoint = function (arr, curPoint, threshold) {
   return obj;
 };
 
+export const getKonvaConfigByObj = function (arr, obj) {
+  let obj1 = {};
+  if (!isEmpty(obj)) {
+    for (var i = 0; i < arr.length; i++) {
+      const item = arr[i];
+      if (item.key == obj.key) {
+        obj1 = item;
+        break;
+      }
+    }
+  }
+  return obj1;
+};
 export function getCenter(p1, p2) {
   return {
     x: (p1.x + p2.x) / 2,

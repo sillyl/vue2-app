@@ -1,15 +1,18 @@
 <template>
   <div class="home">
-    <Konva />
+    <!-- <Konva /> -->
+    <PgmKonva />
   </div>
 </template>
 
 <script>
 import Konva from "@/components/Konva/Index.vue";
+import PgmKonva from "./PgmKonva/Index.vue";
 export default {
   name: "HomeView",
   components: {
-    Konva,
+    // Konva,
+    PgmKonva,
     // CesiumViewer,
   },
 };
