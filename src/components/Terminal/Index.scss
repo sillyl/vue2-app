@@ -1,4 +1,4 @@
-.terminal {
+.custom_terminal {
   margin-top: 8px;
 
   .xterm {
@@ -8,11 +8,27 @@
   .input-content {
     margin: 10px;
 
+    h4{
+      .el-button {
+        margin-left: 8px;
+      }
+    }
+
     .input-action {
       margin-top: 10px;
   
       .el-input {
         width: 90%;
+
+        ::v-deep{
+          .el-input__inner{
+            background-color: #000;
+  
+            #placeholder{
+              color: #fff;
+            }
+          }
+        }
       }
   
       .el-button {

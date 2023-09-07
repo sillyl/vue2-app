@@ -1,7 +1,7 @@
 <template>
   <div class="home">
     <!-- <Konva /> -->
-    <PgmKonva />
+    <!-- <PgmKonva /> -->
   </div>
 </template>
 
@@ -12,7 +12,7 @@ export default {
   name: "HomeView",
   components: {
     // Konva,
-    PgmKonva,
+    // PgmKonva,
     // CesiumViewer,
   },
 };

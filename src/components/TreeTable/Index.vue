@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="custom_tree_table">
     <el-tree
       :data="data"
       node-key="id"
@@ -89,20 +89,28 @@ export default {
 </script>
 <style lang="scss" scoped>
 @import "@/assets/css/common.scss";
+.custom_tree_table {
+  height: 100%;
+}
+
+.el-tree {
+  height: 100%;
+  overflow: auto;
+}
 
 ::v-deep {
   .el-tree-node__content {
-    // width: 100%;
     display: inherit;
     height: auto;
   }
 }
 
 .custom-tree-node {
-  width: inherit;
+  width: 100%;
+  display: inline-block;
   font-size: 14px;
   padding-right: 8px;
-  margin: 4px;
+  margin: 6px;
 
   .tree_label {
     display: inline-block;

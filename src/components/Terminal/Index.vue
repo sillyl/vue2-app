@@ -1,165 +1,174 @@
 <template>
-  <div class='terminal'>
+  <div class="custom_terminal">
     <div id="xterm" class="xterm" />
     <div class="input-content" v-if="visibleInput">
-      <h4> 输入端  <el-button type="primary" size="mini" @click="onReconnect">重连</el-button></h4>
+      <h4>
+        输入端
+        <el-button type="primary" size="mini" @click="onReconnect"
+          >重连</el-button
+        >
+      </h4>
       <div class="input-action">
         <el-input v-model="inputVal" placeholder="请输入"></el-input>
-        <el-button type="primary"  size="mini" @click="onClick">发送</el-button>
+        <el-button type="primary" size="mini" @click="onClick">发送</el-button>
       </div>
     </div>
   </div>
 </template>
 <script>
-import 'xterm/css/xterm.css'
-import { Terminal } from 'xterm'
-import { FitAddon } from 'xterm-addon-fit'
-import { AttachAddon } from 'xterm-addon-attach'
-import { debounce } from 'lodash'
+import "xterm/css/xterm.css";
+import { Terminal } from "xterm";
+import { FitAddon } from "xterm-addon-fit";
+import { AttachAddon } from "xterm-addon-attach";
+import { debounce } from "lodash";
 
 export default {
-  name: 'Terminal',
+  name: "Terminal",
   props: {
     socketURI: {
       type: String,
-      default: ''
+      default: "",
     },
     visibleInput: {
       type: Boolean,
-      default: true
-    }
+      default: true,
+    },
   },
-  data () {
+  data() {
     return {
-      inputVal: '',
+      inputVal: "",
       term: null,
       terminalOptions: {
-        rendererType: 'canvas', // 渲染类型
+        rendererType: "canvas", // 渲染类型
         rows: 40, // 行数
         cols: 100, // 不指定行数，自动回车后光标从下一行开始
         convertEol: true, // 启用时，光标将设置为下一行的开头
         scrollback: 50, // 终端中的回滚量
         disableStdin: false, // 是否应禁用输入
         windowsMode: true, // 根据窗口换行
-        cursorStyle: 'bar', // 光标样式
+        cursorStyle: "bar", // 光标样式
         cursorWidth: 2, // 光标宽度
         cursorBlink: true, // 光标闪烁
         theme: {
-          foreground: '#ECECEC', // 字体
-          background: '#000000', // 背景色
-          cursor: 'help'// 设置光标
-        }
+          foreground: "#ECECEC", // 字体
+          background: "#000000", // 背景色
+          cursor: "help", // 设置光标
+        },
       },
-      socket: '',
-      accessToken: 'token',
+      socket: "",
+      accessToken: "token",
       heartCheck: {
         timeout: 5000,
         timeoutObj: null,
-        message: 'h'
+        message: "h",
       },
-      onResize: null
+      onResize: null,
+    };
+  },
+  mounted() {
+    if (this.term) {
+      this.term.dispose();
     }
+    this.initTerm();
   },
-  mounted () {
-    if (this.term) { this.term.dispose() }
-    this.initTerm()
-  },
-  beforeDestroy () {
-    this.socket && this.socket.close()
-    this.term && this.term.dispose()
-    this.clearHeartCheck()
-    window.removeEventListener('resize', this.onResize)
+  beforeDestroy() {
+    this.socket && this.socket.close();
+    this.term && this.term.dispose();
+    this.clearHeartCheck();
+    window.removeEventListener("resize", this.onResize);
   },
   methods: {
-    initTerm () {
-      const term = new Terminal({ ...this.terminalOptions })
-      if (!this.socketURI) return
-      this.initSocket()
-      const attachAddon = new AttachAddon(this.socket)
-      const fitAddon = new FitAddon()
-      term.loadAddon(attachAddon)
-      term.loadAddon(fitAddon)
-      term.open(document.getElementById('xterm'))
-      fitAddon.fit()
-      term.focus()
-      function onResize () {
+    initTerm() {
+      const term = new Terminal({ ...this.terminalOptions });
+      if (!this.socketURI) return;
+      this.initSocket();
+      const attachAddon = new AttachAddon(this.socket);
+      const fitAddon = new FitAddon();
+      term.loadAddon(attachAddon);
+      term.loadAddon(fitAddon);
+      term.open(document.getElementById("xterm"));
+      fitAddon.fit();
+      term.focus();
+      function onResize() {
         try {
-          fitAddon.fit()
+          fitAddon.fit();
           // 窗口大小改变时触发xterm的resize方法，向后端发送行列数，格式由后端决定
-          term.onResize(size => {
-            const prompt = { Op: 'resize', Cols: size.cols, Rows: size.rows }
+          term.onResize((size) => {
+            const prompt = { Op: "resize", Cols: size.cols, Rows: size.rows };
             if (this.socket) {
-              this.socket.send(JSON.stringify(prompt))
+              this.socket.send(JSON.stringify(prompt));
             }
-          })
+          });
         } catch (err) {
-          console.log('err', err.message)
+          console.log("err", err.message);
         }
       }
-      window.addEventListener('resize', debounce(onResize, 100))
-      this.term = term
+      window.addEventListener("resize", debounce(onResize, 100));
+      this.term = term;
     },
-    initSocket () {
+    initSocket() {
       // this.socket = new WebSocket(this.socketURI, 'websockt')
-      this.socket = new WebSocket(this.socketURI)
+      this.socket = new WebSocket(this.socketURI);
 
-      this.socketOnClose()
-      this.socketOnOpen()
-      this.socketOnMessage()
-      this.socketOnError()
+      this.socketOnClose();
+      this.socketOnOpen();
+      this.socketOnMessage();
+      this.socketOnError();
     },
-    socketOnOpen () {
+    socketOnOpen() {
       this.socket.onopen = () => {
         // 链接成功后
-        console.log('websocket链接成功---')
-        this.startHeartCheck()
-      }
+        console.log("websocket链接成功---");
+        this.startHeartCheck();
+      };
     },
-    socketOnMessage () {
+    socketOnMessage() {
       this.socket.onmessage = (msg) => {
         // this.term.write(msg?.data)
-        console.log('this.msg', msg)
-      }
+        console.log("this.msg", msg);
+      };
     },
-    socketOnClose () {
+    socketOnClose() {
       this.socket.onclose = (event) => {
         if (event.wasClean) {
-          console.log(`[close] Connection closed cleanly, code=${event.code} reason=${event.reason}`)
+          console.log(
+            `[close] Connection closed cleanly, code=${event.code} reason=${event.reason}`
+          );
         } else {
           // 例如服务器进程被杀死或网络中断
           // 在这种情况下，event.code 通常为 1006
-          console.log('[close] Connection died')
+          console.log("[close] Connection died");
         }
-        this.clearHeartCheck()
-      }
+        this.clearHeartCheck();
+      };
     },
-    socketOnError () {
+    socketOnError() {
       this.socket.onerror = () => {
-        this.$message.error('websoket连接失败，请刷新！')
-      }
+        this.$message.error("websoket连接失败，请刷新！");
+      };
     },
-    startHeartCheck () {
+    startHeartCheck() {
       if (this.socket) {
         this.heartCheck.timeoutObj = setInterval(() => {
           if (this.socket && this.socket?.readyState === 1) {
-            this.socket.send(this.heartCheck.message) // 开始发送特殊标识,后端返回当前用户的工作路径
+            this.socket.send(this.heartCheck.message); // 开始发送特殊标识,后端返回当前用户的工作路径
           }
-        }, this.heartCheck.timeout)
+        }, this.heartCheck.timeout);
       }
     },
-    clearHeartCheck () {
-      clearInterval(this.heartCheck.timeoutObj)
+    clearHeartCheck() {
+      clearInterval(this.heartCheck.timeoutObj);
     },
-    onReconnect(){
-      this.initSocket()
+    onReconnect() {
+      this.initSocket();
     },
-    onClick () {
-      this.socket.send(this.inputVal)
-    }
-  }
-}
+    onClick() {
+      this.socket.send(this.inputVal);
+    },
+  },
+};
 </script>
 
 <style lang="scss" scoped>
-  @import './index.scss'
+@import "./Index.scss";
 </style>

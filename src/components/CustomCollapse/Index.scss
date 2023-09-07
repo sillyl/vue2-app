@@ -1,0 +1,25 @@
+@import '@/assets/css/common.scss';
+$prefixCls:"custom_collapse";
+
+.#{$prefixCls}{
+  position: absolute;
+  bottom: 0px;
+  width: 100%;
+  &_btn{
+    background-color: #0885e0;
+    text-align: center;
+    opacity: 0.8;
+    height: 22px;
+    i{
+      font-size: 18px;
+      font-weight: bold;
+    }
+  }
+
+  &_content{
+    background-color: $header-color-rgba;
+    height: calc(100% - 22px);
+    overflow: auto;
+  }
+
+}
