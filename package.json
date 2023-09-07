@@ -14,6 +14,8 @@
     "file-loader": "^6.2.0",
     "hammerjs": "^2.0.8",
     "konva": "^9.2.0",
+    "leaflet": "^1.9.4",
+    "leaflet-contextmenu": "^1.4.0",
     "lodash": "^4.17.21",
     "url-loader": "^4.1.1",
     "videojs-flash": "^2.2.1",

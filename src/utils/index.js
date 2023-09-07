@@ -7,3 +7,9 @@ export function getCurrentTime() {
   time = time.replaceAll("T", "");
   return time.substr(0, 14);
 }
+
+import leafletMap from "./Leaflet";
+
+export default {
+  leafletMap,
+};
