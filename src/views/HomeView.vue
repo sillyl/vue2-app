@@ -2,7 +2,9 @@
   <div class="home">
     <!-- <Konva /> -->
     <!-- <PgmKonva /> -->
-    <div class="map-container" id="map"></div>
+    <div class="map-container" id="map">
+      <div id="coordinate" class="leaflet-control"></div>
+    </div>
   </div>
 </template>
 
@@ -166,6 +168,26 @@ export default {
 
       // map.removeLayer(osm); // 感觉没啥效果
       L.control.layers(baseMaps, overlayMaps, { collapsed: false }).addTo(map);
+
+      /* leaflet event */
+
+      map.on("mousemove", function (e) {
+        document.querySelector("#coordinate").innerHTML =
+          "lat: " + e.latlng.lat + "<br />lng: " + e.latlng.lng;
+      });
+
+      map.on(
+        "click",
+        function (latlng, layerPoint, containerPoint, originalEvent) {
+          console.log(
+            "click",
+            latlng,
+            layerPoint,
+            containerPoint,
+            originalEvent
+          );
+        }
+      );
     },
   },
 };
@@ -177,5 +199,9 @@ export default {
   top: 0px; //添加100px间距，把上面的导航栏让出来
   width: 100%;
   height: 100%;
+  .leaflet-control {
+    bottom: 0px;
+    position: absolute;
+  }
 }
 </style>
