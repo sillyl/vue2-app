@@ -9,11 +9,23 @@
 <script>
 import Konva from "@/components/Konva/Index.vue";
 import PgmKonva from "./PgmKonva/Index.vue";
-import "leaflet-contextmenu/dist/leaflet.contextmenu.css";
-import "leaflet-contextmenu/dist/leaflet.contextmenu";
-import L from "leaflet";
+// import "leaflet-contextmenu/dist/leaflet.contextmenu.css";
+// import "leaflet-contextmenu/dist/leaflet.contextmenu";
+import L, { featureGroup } from "leaflet";
 import "leaflet/dist/leaflet.css";
+
+/* 解决 默认 marker 图片展示不出来问题 */
+
+delete L.Icon.Default.prototype._getIconUrl;
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl: require("leaflet/dist/images/marker-icon-2x.png"),
+  iconUrl: require("leaflet/dist/images/marker-icon.png"),
+  shadowUrl: require("leaflet/dist/images/marker-shadow.png"),
+});
 const iconUrl = require("@/assets/img/marker.png");
+import { lineMap } from "./data/lineMap";
+import { point } from "./data/point";
+import { polygon } from "./data/polygon";
 export default {
   name: "HomeView",
   data() {
@@ -42,7 +54,7 @@ export default {
         maxZoom: 14,
         // center: [39.550339, 116.114129],
         center: [31.02, 120.2], // ["纬度","经度"]
-        zoom: 10,
+        zoom: 5,
         zoomControl: true, // 缩放控件
         attributionControl: false, // 版权控件
         crs: L.CRS.EPSG3857,
@@ -115,6 +127,20 @@ export default {
 
       // map.removeLayer(osm); // 感觉没啥效果
       L.control.layers(baseMaps, overlayMaps, { collapsed: false }).addTo(map);
+
+      /* GeoJson */
+      L.geoJSON(point).addTo(map);
+      L.geoJSON(lineMap).addTo(map);
+      L.geoJSON(polygon, {
+        onEachFeature: function (feature, layer) {
+          layer.bindPopup(`<b>Name: </b>` + feature.properties.name);
+        },
+        style: {
+          fillColor: "red",
+          fillOpacity: 0.3,
+          stroke: false,
+        },
+      }).addTo(map);
     },
   },
 };
