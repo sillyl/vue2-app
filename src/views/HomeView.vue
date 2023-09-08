@@ -86,6 +86,24 @@ export default {
         "http://webrd01.is.autonavi.com/appmaptile?lang=zh_cn&size=1&scale=1&style=7&x={x}&y={y}&z={z}"
       ).addTo(map);
 
+      // vms
+      const nexrad = L.tileLayer.wms(
+        "http://mesonet.agron.iastate.edu/cgi-bin/wms/nexrad/n0r.cgi",
+        {
+          layers: "nexrad-n0r-900913",
+          format: "image/png",
+          transparent: true,
+          attribution: "Weather data © 2012 IEM Nexrad",
+        }
+      );
+
+      // vms geoserver 需要本地安装启动
+      const vmsTest = L.tileLayer.wms("http://localhost:9090/geoserver/wms", {
+        layers: "nurc:Img_Sample", // geoserver-》layer Preview 对应的name
+        format: "image/png",
+        transparent: true,
+        attribution: "wms test",
+      });
       // Marker
       const myIcon = L.icon({
         iconUrl: iconUrl,
@@ -113,6 +131,20 @@ export default {
       // }).addTo(map);
       // secendMarker.bindPopup("谁知道" + secendMarker.getLatLng()).openPopup();
 
+      /* GeoJson */
+      const pointJSON = L.geoJSON(point).addTo(map);
+      const lineMapJSON = L.geoJSON(lineMap).addTo(map);
+      const polygonJSON = L.geoJSON(polygon, {
+        onEachFeature: function (feature, layer) {
+          layer.bindPopup(`<b>Name: </b>` + feature.properties.name);
+        },
+        style: {
+          fillColor: "red",
+          fillOpacity: 0.3,
+          stroke: false,
+        },
+      }).addTo(map);
+
       // 图层控件 layer Controller
       const baseMaps = {
         OpenStreetMap: osm,
@@ -123,24 +155,17 @@ export default {
       const overlayMaps = {
         "First Marker": firstMarker,
         // "Second Marker": secendMarker,
+
+        point: pointJSON,
+        lineMap: lineMapJSON,
+        polygon: polygonJSON,
+
+        nexrad: nexrad,
+        wms: vmsTest,
       };
 
       // map.removeLayer(osm); // 感觉没啥效果
       L.control.layers(baseMaps, overlayMaps, { collapsed: false }).addTo(map);
-
-      /* GeoJson */
-      L.geoJSON(point).addTo(map);
-      L.geoJSON(lineMap).addTo(map);
-      L.geoJSON(polygon, {
-        onEachFeature: function (feature, layer) {
-          layer.bindPopup(`<b>Name: </b>` + feature.properties.name);
-        },
-        style: {
-          fillColor: "red",
-          fillOpacity: 0.3,
-          stroke: false,
-        },
-      }).addTo(map);
     },
   },
 };
