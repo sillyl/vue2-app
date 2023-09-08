@@ -167,7 +167,13 @@ export default {
       };
 
       // map.removeLayer(osm); // 感觉没啥效果
-      L.control.layers(baseMaps, overlayMaps, { collapsed: false }).addTo(map);
+      L.control
+        .layers(
+          baseMaps,
+          overlayMaps
+          // { collapsed: false } // 默认 true 不展开
+        )
+        .addTo(map);
 
       /* leaflet event */
 
