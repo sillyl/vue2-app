@@ -55,6 +55,11 @@ const routes = [
     component: () => import(/* webpackChunkName: "about" */ "@/components/TreeTable/demo.vue"),
   },
   {
+    path: "/leaflet",
+    name: "Leaflet",
+    component: () => import(/* webpackChunkName: "Leaflet" */ "@/views/Leaflet/Index.vue"),
+  },
+  {
     path: '/notFound',
     name: 'NotFound',
     meta: {

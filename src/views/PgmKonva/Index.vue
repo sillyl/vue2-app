@@ -46,7 +46,6 @@
               radius: 8,
               fill: '#ff0000',
             }"
-            :draggable="true"
           >
           </v-circle>
         </v-group>
@@ -139,6 +138,14 @@ export default {
       // 插入节点的最大数量（包括已删除的），这是个递增值
       historyMaxnodeNum: 0,
       points: new Map(),
+      isDraging: false,
+      startDragData: null,
+      diffLayerX: 0,
+      diffLayerY: 0,
+      diffClientX: 0,
+      diffClientY: 0,
+      diffPageX: 0,
+      diffPageY: 0,
     };
   },
   computed: {
@@ -158,6 +165,13 @@ export default {
         },
         stagePointerPosition: this.stagePointerPosition,
         stageScale: this.stageScale,
+        isDraging: this.isDraging,
+        diffLayerX: this.diffLayerX,
+        diffLayerY: this.diffLayerY,
+        diffClientX: this.diffClientX,
+        diffClientY: this.diffClientY,
+        diffPageX: this.diffPageX,
+        diffPageY: this.diffPageY,
       };
     },
   },
@@ -165,27 +179,54 @@ export default {
     CircleTooltip,
   },
   mounted() {
-    this.viewMap();
-    this.getCircleNeedDataList();
+    this.getCircleData();
   },
   watch: {
     $route: function (newVal, oldVal) {
       if (!isEqual(newVal, oldVal)) {
-        this.viewMap();
-        this.getCircleNeedDataList();
+        this.getCircleData();
       }
     },
   },
   methods: {
     onDragstart: function (el) {
-      console.log("qq", el);
+      this.isDraging = true;
+      const { layerX, layerY, clientX, clientY, pageX, pageY } = el.evt;
+      this.startDragData = {
+        xL: layerX,
+        yL: layerY,
+        xC: clientX,
+        yC: clientY,
+        xP: pageX,
+        yP: pageY,
+      };
     },
     onDragmove: function () {
       this.visibleCircleTooltip = false;
     },
     onDragend: function (e) {
-      console.log("kkkkkkkkkkkk", e);
-      this.initData();
+      const { xL, yL, xC, yC, xP, yP } = this.startDragData;
+      const { layerX, layerY, clientX, clientY, pageX, pageY } = e.evt;
+      console.log("onDragstart", xL, yL, xC, yC, xP, yP);
+      console.log("onDragend", layerX, layerY, clientX, clientY, pageX, pageY);
+
+      this.diffLayerX = layerX - xL;
+      this.diffLayerY = layerY - yL;
+      this.diffClientX = clientX - xC;
+      this.diffClientY = clientY - yC;
+      this.diffPageX = pageX - xP;
+      this.diffPageY = pageY - yP;
+    },
+    getCircleData: async function () {
+      try {
+        // GlobalLoading.loadingShow();
+        await this.viewMap();
+        await this.getCircleNeedDataList();
+      } catch (error) {
+        // GlobalLoading.loadingClose();
+      } finally {
+        // GlobalLoading.loadingClose();
+      }
     },
     getCircleNeedDataList: async function () {
       this.identifierList = await [
@@ -364,11 +405,21 @@ export default {
 
     onStageClick: function (e) {
       const { layerX, layerY, clientX, clientY } = e.evt;
+      console.log("click", layerX, layerY, clientX, clientY);
+      console.log(
+        "ooo",
+        this.diffLayerX,
+        this.diffLayerY,
+        this.diffClientX,
+        this.diffClientY,
+        this.diffPageX,
+        this.diffPageY
+      );
       this.triggerPosition = {
-        layerX,
-        layerY,
-        clientX,
-        clientY,
+        layerX: layerX,
+        layerY: layerY,
+        clientX: clientX,
+        clientY: clientY,
       };
       this.visibleCircleTooltip = true;
       this.initData();

@@ -1,16 +1,10 @@
 <template>
-  <div class="home">
-    <!-- <Konva /> -->
-    <PgmKonva />
-    <!-- <div class="map-container" id="map">
-      <div id="coordinate" class="leaflet-control"></div>
-    </div> -->
+  <div class="map-container" id="map">
+    <div id="coordinate" class="leaflet-control"></div>
   </div>
 </template>
 
 <script>
-import Konva from "@/components/Konva/Index.vue";
-import PgmKonva from "./PgmKonva/Index.vue";
 // import "leaflet-contextmenu/dist/leaflet.contextmenu.css";
 // import "leaflet-contextmenu/dist/leaflet.contextmenu";
 import L, { featureGroup } from "leaflet";
@@ -43,11 +37,11 @@ export default {
   },
   components: {
     // Konva,
-    PgmKonva,
+    // PgmKonva,
     // CesiumViewer,
   },
   mounted() {
-    // this.initMap();
+    this.initMap();
   },
   methods: {
     initMap() {
@@ -211,4 +205,4 @@ export default {
   }
 }
 </style>
-./Leaflet/data/lineMap./Leaflet/data/point./Leaflet/data/polygon
+./data/lineMap./data/point./data/polygon

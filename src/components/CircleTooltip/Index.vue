@@ -168,7 +168,7 @@
   </div>
 </template>
 
-<script lang="ts">
+<script>
 import { isEqual, isEmpty } from "lodash";
 import { getFθ, getMinPoint } from "@/utils/CoordinatePickupFun.js";
 let clickNum = 0;
@@ -230,13 +230,11 @@ export default {
     // 确保父元素样式
     const dom = document.getElementById(this.parentId);
     dom.style.position = "relative";
-    dom.style.overflow = "auto";
+    // dom.style.overflow = "auto";
   },
   updated() {
     const dom = document.getElementById(this.parentId);
     const dom1 = document.getElementById("content");
-    console.log("visible && !isContent", this.visible, this.isContent);
-
     const stagePointerPositionX =
       (this.circleNeedData.stagePointerPosition &&
         this.circleNeedData.stagePointerPosition.x) ||
@@ -278,7 +276,6 @@ export default {
         // touch 事件拿到的位置都是相遇于视口的，对于top 和 left 需要处理偏移量和滚动距离
         if (!this.isContent) {
           if (pageX) {
-            // console.log('updated', dom.offsetLeft, dom.scrollLeft, stagePointerPositionX, this.circleNeedData.stageScale);
             this.directions.cx = pageX - dom.offsetLeft + dom.scrollLeft;
             this.directions.cy = pageY - dom.offsetTop + dom.scrollTop;
             this.top = this.directions.cy - 33.6 / 2;
@@ -287,8 +284,6 @@ export default {
             this.contentLeft = this.left;
             const cx = (this.directions.cx - stagePointerPositionX) / 1.0;
             const cy = (this.directions.cy - stagePointerPositionY) / 1.0;
-            // console.log('cx', cx, cy);
-
             this.circleData.curLayerUvX = (
               cx /
               (this.circleNeedData.stage.width * this.circleNeedData.stageScale)
@@ -306,16 +301,6 @@ export default {
         }
       }
     }
-    console.log(
-      "updated",
-      this.circleData.curLayerUvX,
-      this.circleData.curLayerUvY,
-      "otherssssss",
-      this.directions.cx,
-      stagePointerPositionX,
-      this.circleNeedData.stage.width,
-      this.circleNeedData.stageScale
-    );
 
     if (this.isContent) {
       //更新content 方位
@@ -377,13 +362,6 @@ export default {
         this.circleNeedData.points,
         { x: this.circleData.curLayerUvX, y: this.circleData.curLayerUvY },
         this.threshold / this.circleNeedData.stageScale
-      );
-      console.log(
-        "onTouchstart",
-        this.circleData.curLayerUvX,
-        this.circleData.curLayerUvY,
-        res,
-        this.circleNeedData.points
       );
 
       this.updateFormData(res);
@@ -470,18 +448,7 @@ export default {
     },
 
     processScaleData: function () {
-      // let point = {
-      //   location: {
-      //     omega: this.form.omega,
-      //     x: this.circleData.curLayerUvX,
-      //     y: this.circleData.curLayerUvY,
-      //     insertScale: 1.0,
-      //   },
-      //   process: this.form.selectPoint.process,
-      //   station: this.form.selectPoint.station,
-      // };
       // 缩放比存在时 重新更新坐标位置
-      // if (this.circleNeedData.stageScale && this.circleNeedData.stagePointerPosition) {
       // touch scale不等于1 时，重新你计算组件UV
       const cx =
         (this.directions.cx - this.circleNeedData.stagePointerPosition.x) /
@@ -489,9 +456,6 @@ export default {
       const cy =
         (this.directions.cy - this.circleNeedData.stagePointerPosition.y) /
         this.circleNeedData.stageScale;
-      // this.circleData.curLayerUvX = (cx / (this.circleNeedData.stage.width * this.circleNeedData.stageScale)).toFixed(6);
-      // this.circleData.curLayerUvY = (cy / (this.circleNeedData.stage.height * this.circleNeedData.stageScale)).toFixed(6);
-
       const point = {
         location: {
           omega: this.form.omega,
@@ -504,16 +468,6 @@ export default {
       };
       this.directions.cx = cx;
       this.directions.cy = cy;
-      // this.directions = { cx, cy };
-      // }
-      console.log(
-        "processScaleData",
-        point,
-        this.directions,
-        this.circleData.curLayerUvX,
-        this.circleData.curLayerUvY
-      );
-
       return {
         triggerPoint: point,
         directions: this.directions,
