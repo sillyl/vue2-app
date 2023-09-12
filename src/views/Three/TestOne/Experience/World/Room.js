@@ -10,7 +10,9 @@ export default class Room {
     this.resources = this.experience.resources;
     this.time = this.experience.time;
     this.room = this.resources.items.room;
+    console.log("this.room", this.room);
     this.actualRoom = this.room.scene;
+    console.log("actualRoom", this.actualRoom);
     this.roomChildren = {};
 
     this.lerp = {
@@ -26,18 +28,19 @@ export default class Room {
 
   setModel() {
     this.actualRoom.children.forEach((child) => {
+      // 显示阴影
       child.castShadow = true;
       child.receiveShadow = true;
 
       if (child instanceof THREE.Group) {
         child.children.forEach((groupchild) => {
-          console.log(groupchild.material);
+          console.log("room child material", groupchild.material);
           groupchild.castShadow = true;
           groupchild.receiveShadow = true;
         });
       }
 
-      // console.log(child);
+      console.log("child", child);
 
       if (child.name === "Aquarium") {
         // console.log(child);
