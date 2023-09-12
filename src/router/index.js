@@ -60,6 +60,21 @@ const routes = [
     component: () => import(/* webpackChunkName: "Leaflet" */ "@/views/Leaflet/Index.vue"),
   },
   {
+    path: "/three",
+    name: "Three",
+    component: () => import(/* webpackChunkName: "Three" */ "@/views/Three/Index.vue"),
+  },
+  {
+    path: "/three/test",
+    name: "Three",
+    component: () => import(/* webpackChunkName: "Three" */ "@/views/Three/Test.vue"),
+  },
+  {
+    path: "/three/testone",
+    name: "Three",
+    component: () => import(/* webpackChunkName: "Three" */ "@/views/Three/TestOne/TestOne.vue"),
+  },
+  {
     path: '/notFound',
     name: 'NotFound',
     meta: {
