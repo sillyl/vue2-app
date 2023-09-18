@@ -59,9 +59,7 @@ const handleError = (response = { config: { showError: {} } }) => {
     data,
     message,
   } = response;
-  console.log("response", response);
   const { isShow, showPopup, title, onOk } = showError;
-
   if (isShow) {
     if (showPopup) {
       MessageBox.alert(data?.message, title, {
@@ -85,9 +83,10 @@ const handleError = (response = { config: { showError: {} } }) => {
         data?.message ||
           data?.msg ||
           data?.Message ||
-          `Error Message: ${message}`
+          ` ErrorCode: ${data?.code}, Error Message: ${message}`
       );
-      return;
+      // 比如：接口code:100500 接口异常拒绝向下执行逻辑
+      return Promise.reject(data?.message || data?.msg || data?.Message);
     }
   }
 
@@ -101,8 +100,8 @@ const axiosInstance = axios.create({
   withCredentials: true,
   headers: {
     "Content-Type": "application/json",
-    // 'Accept-Language': '',
     Authorization: "bearer " + null,
+    "X-Requested-With": "XMLHttpRequest",
   },
   xsrfCookieName: "Ag-Csrf-Token",
   xsrfHeaderName: "Ag-Csrf-Token",
@@ -116,6 +115,10 @@ axiosInstance.interceptors.request.use(
       showPopup: false,
       title: "",
     };
+    if (config.isFormData) {
+      config.headers["Content-Type"] = "application/x-www-form-urlencoded";
+    }
+
     const instanceShowError = config.showError;
 
     config.showError = Object.assign(defaultShowError, instanceShowError);
@@ -136,9 +139,9 @@ axiosInstance.interceptors.request.use(
 // 添加一个响应拦截器
 axiosInstance.interceptors.response.use(
   (response) => {
-    const { data } = response;
-
-    if (response.config?.skipGlobalHandler && !data.code) {
+    const { data, config } = response;
+    if (config.skipGlobalHandler && !data.code) {
+      // 接口直接返回 正常数据格式
       GlobalLoading.loadingClose();
       return Promise.resolve(data);
     }
@@ -158,12 +161,6 @@ axiosInstance.interceptors.response.use(
       router.push("/login"); // 或者 window.location.href = '/login'
       return Promise.reject(data);
     }
-
-    // 3. 无相关权限
-    // if (data.code === STATUS_CODE.PERMISSION_DENIED || data.code === STATUS_CODE.NOT_FOUND) {
-    //   window.eventTarget.dispatchEvent(REDIRECT_TO_404);
-    //   return Promise.reject(data);
-    // }
 
     GlobalLoading.loadingClose();
     // 4.其他失败，比如校验不通过等

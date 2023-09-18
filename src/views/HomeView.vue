@@ -1,23 +1,29 @@
 <template>
   <div class="home">
     <!-- <Konva /> -->
-    <PgmKonva />
+    <!-- <PgmKonva /> -->\
+    <webrtcSteamer :videoUrl="videoUrl" :scale="1" />
   </div>
 </template>
 
 <script>
 import Konva from "@/components/Konva/Index.vue";
 import PgmKonva from "./PgmKonva/Index.vue";
+import webrtcSteamer from "./Webetc/Index.vue";
 
 export default {
   name: "HomeView",
   data() {
-    return {};
+    return {
+      videoUrl:
+        "rtsp://zephyr.rtsp.stream/pattern?streamKey=1477c31f6088af9822a2590683495dfe",
+    };
   },
   components: {
     // Konva,
-    PgmKonva,
+    // PgmKonva,
     // CesiumViewer,
+    webrtcSteamer,
   },
   mounted() {},
   methods: {},
