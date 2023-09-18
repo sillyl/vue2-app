@@ -2,7 +2,7 @@
   <div class="home">
     <!-- <Konva /> -->
     <!-- <PgmKonva /> -->\
-    <webrtcSteamer :videoUrl="videoUrl" :scale="1" />
+    <webrtcSteamer :scale="1" />
   </div>
 </template>
 
