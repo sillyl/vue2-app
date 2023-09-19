@@ -6,9 +6,6 @@ import App from "./App.vue";
 import router from "./router";
 import store from "./store";
 import "@/assets/css/common.scss";
-import VideoPlayer from "vue-video-player";
-import "vue-video-player/src/custom-theme.css";
-import "video.js/dist/video-js.css";
 import { toDark } from "@/utils/dark";
 import leafletMap from "@/utils";
 
@@ -18,7 +15,7 @@ Vue.prototype.$leafletMap = leafletMap;
 
 Vue.use(VueKonva);
 Vue.use(ElementUI);
-Vue.use(VideoPlayer);
+// Vue.use(VideoPlayer);
 new Vue({
   router,
   store,

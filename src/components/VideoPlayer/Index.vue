@@ -3,7 +3,6 @@
     class="video-player"
     id="video-player"
     :style="{ top: top + 'px', left: left + 'px' }"
-    v-if="isShow"
   >
     <div class="video-player-header" @mousedown="onCircleMousedown">
       <span class="video-player-header-x" @click="onClickClosed">x</span>
@@ -22,13 +21,19 @@
 
 <script>
 /* eslint-disable prettier/prettier */
+// import VideoPlayer from "vue-video-player";
+// import videojs from 'video.js'
+import "vue-video-player/src/custom-theme.css";
+import "video.js/dist/video-js.css";
+import "videojs-contrib-hls";
 import { videoPlayer } from "vue-video-player";
 import "videojs-flash";
 import SWF_URL from "videojs-swf/dist/video-js.swf";
-import Hammer from "hammerjs";
+// import Hammer from "hammerjs";
+// videojs.options.flash.swf = SWF_URL // 设置flash路径，Video.js会在不支持html5的浏览中使用flash播放视频文件
 export default {
   name: "VideoPlayer",
-  props: ["isShow"],
+  props: ["isShow", "src"],
   data() {
     return {
       top: 0,
@@ -57,16 +62,25 @@ export default {
         //   type: 'rtmp/mp4',
         //   src: 'rtmp://58.200.131.2:1935/livetv/hunantv' // 亲测可用
         // }],
-        sources: [{ // 流配置，数组形式，会根据兼容顺序自动切换
-          type: 'rtmp/mp4',
-          src: 'rtmp://184.72.239.149/vod/&mp4:BigBuckBunny_115k.mov'
-        }, {
-          withCredentials: false,
-          type: 'application/x-mpegURL',
-          src: 'http://playertest.longtailvideo.com/adaptive/bipbop/gear4/prog_index.m3u8'
-        }],
-        techOrder: ['html5', 'flash'], // 兼容顺序
-        flash: { hls: { withCredentials: false } },
+        sources: [
+          { // 流配置，数组形式，会根据兼容顺序自动切换
+            type: 'video/mp4',
+            controls: true,
+            src: this.src
+          },
+        
+        //  { // 可正常播放
+        //   withCredentials: false,
+        //   type: 'application/x-mpegURL',
+        //   src: 'http://playertest.longtailvideo.com/adaptive/bipbop/gear4/prog_index.m3u8'
+        // }
+      ],
+        techOrder: [ 'flash', 'html5'], // 兼容顺序
+        flash: { 
+          hls: { 
+            withCredentials: false 
+          },
+        },
         html5: { hls: { withCredentials: false } },
         sourceOrder: true,
         // flash: {

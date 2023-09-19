@@ -55,6 +55,27 @@ const routes = [
     component: () => import(/* webpackChunkName: "about" */ "@/components/TreeTable/demo.vue"),
   },
   {
+    path: "/videoPlayer",
+    name: "VideoPlayer",
+    component: () => import(/* webpackChunkName: "VideoPlayer" */ "@/components/VideoPlayer/Index.vue"),
+  },
+  {
+    path: "/videoPlayerDemo",
+    name: "VideoPlayerDemo",
+    component: () => import(/* webpackChunkName: "VideoPlayer" */ "@/components/VideoPlayer/Demo.vue"),
+  },
+  {
+    path: "/videoPlayerTest",
+    name: "VideoPlayerTest",
+    component: () => import(/* webpackChunkName: "VideoPlayer" */ "@/components/VideoPlayer/Test.vue"),
+  },
+  {
+    path: "/webrtcSteamer",
+    name: "webrtcSteamer",
+    component: () => import(/* webpackChunkName: "webrtcSteamer" */ "@/views/ShowWebrtc/Index.vue"),
+  },
+  
+  {
     path: "/leaflet",
     name: "Leaflet",
     component: () => import(/* webpackChunkName: "Leaflet" */ "@/views/Leaflet/Index.vue"),

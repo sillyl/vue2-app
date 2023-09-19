@@ -14,7 +14,7 @@
 <script>
 import WebRtcStreamer from "./webrtcstreamer.js";
 export default {
-  name: "index1",
+  name: "Webetc",
   data() {
     return {
       webRtcServer: null,

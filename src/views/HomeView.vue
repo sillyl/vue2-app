@@ -1,15 +1,15 @@
 <template>
   <div class="home">
     <!-- <Konva /> -->
-    <!-- <PgmKonva /> -->\
-    <webrtcSteamer :scale="1" />
+    <!-- <PgmKonva /> -->
+    <VideoPlayer :src="videoUrl" />
   </div>
 </template>
 
 <script>
 import Konva from "@/components/Konva/Index.vue";
 import PgmKonva from "./PgmKonva/Index.vue";
-import webrtcSteamer from "./Webetc/Index.vue";
+import VideoPlayer from "@/components/VideoPlayer/Index.vue";
 
 export default {
   name: "HomeView",
@@ -23,7 +23,7 @@ export default {
     // Konva,
     // PgmKonva,
     // CesiumViewer,
-    webrtcSteamer,
+    VideoPlayer,
   },
   mounted() {},
   methods: {},
@@ -42,3 +42,4 @@ export default {
   }
 }
 </style>
+../components/Webetc/Index.vue
