@@ -42,4 +42,3 @@ export default {
   }
 }
 </style>
-../components/Webetc/Index.vue

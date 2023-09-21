@@ -159,8 +159,8 @@ export default {
 
       canvas.onclick = async function (e) {
         const event = e || event;
-        const x = e.clientX - canvas.offsetLeft; //获取点击后x的坐标
-        const y = e.clientY - canvas.offsetTop; //获取点击后y的坐标
+        const x = e.layerX - canvas.offsetLeft; //获取点击后x的坐标
+        const y = e.layerY - canvas.offsetTop; //获取点击后y的坐标
         that.clickCurX = x;
         that.clickCurY = y;
         // const isTure = ctx.isPointInPath(x, y); // canvas事件中 该方法只会判断最后一层

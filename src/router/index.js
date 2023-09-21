@@ -96,6 +96,11 @@ const routes = [
     component: () => import(/* webpackChunkName: "Three" */ "@/views/Three/TestOne/TestOne.vue"),
   },
   {
+    path: "/terminal",
+    name: "Terminal",
+    component: () => import(/* webpackChunkName: "VideoPlayer" */ "@/components/Terminal/Index.vue"),
+  },
+  {
     path: '/notFound',
     name: 'NotFound',
     meta: {

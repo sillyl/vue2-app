@@ -80,7 +80,7 @@ export default {
   methods: {
     initTerm() {
       const term = new Terminal({ ...this.terminalOptions });
-      if (!this.socketURI) return;
+      // if (!this.socketURI) return;
       this.initSocket();
       const attachAddon = new AttachAddon(this.socket);
       const fitAddon = new FitAddon();
@@ -108,7 +108,9 @@ export default {
     },
     initSocket() {
       // this.socket = new WebSocket(this.socketURI, 'websockt')
-      this.socket = new WebSocket(this.socketURI);
+      this.socket = new WebSocket(
+        "ws://localhost:8090/cpix/v1.0/websocket/device-travel/4"
+      );
 
       this.socketOnClose();
       this.socketOnOpen();
