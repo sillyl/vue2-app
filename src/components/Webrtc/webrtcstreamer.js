@@ -53,7 +53,7 @@ var WebRtcStreamer = (function () {
 
     // getIceServers is not already received
     if (!this.iceServers) {
-      console.log("Get IceServers");
+      console.log("------Get IceServers-----", this.srvurl);
 
       fetch(this.srvurl + "/api/getIceServers")
         .then(this._handleHttpErrors)

@@ -13,8 +13,10 @@
 
 <script>
 import WebRtcStreamer from "./webrtcstreamer.js";
+import "./adapter.min.js";
+import "./jquery-3.5.1.min.js";
 export default {
-  name: "Webetc",
+  name: "Webrtc",
   data() {
     return {
       webRtcServer: null,

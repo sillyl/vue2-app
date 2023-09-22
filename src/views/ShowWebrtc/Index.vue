@@ -5,7 +5,7 @@
 </template>
 
 <script>
-import webrtcSteamer from "@/components/Webetc/Index.vue";
+import webrtcSteamer from "@/components/Webrtc/Index.vue";
 
 export default {
   name: "WebrtcSteamer",
