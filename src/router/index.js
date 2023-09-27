@@ -74,7 +74,11 @@ const routes = [
     name: "webrtcSteamer",
     component: () => import(/* webpackChunkName: "webrtcSteamer" */ "@/views/ShowWebrtc/Index.vue"),
   },
-  
+  {
+    path: "/webrtcSteamer_test",
+    name: "webrtcSteamerTest",
+    component: () => import(/* webpackChunkName: "webrtcSteamer" */ "@/components/Webrtc/Test.vue"),
+  },
   {
     path: "/leaflet",
     name: "Leaflet",

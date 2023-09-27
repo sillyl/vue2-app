@@ -67,7 +67,7 @@ var WebRtcStreamer = (function () {
             localstream
           )
         )
-        .catch((error) => this.onError("getIceServers " + error));
+        .catch((error) => this.onError("getIceServers error" + error));
     } else {
       this.onReceiveGetIceServers(
         this.iceServers,
@@ -218,7 +218,9 @@ var WebRtcStreamer = (function () {
         this.send("remote channel openned");
       };
       evt.channel.onmessage = function (event) {
-        console.log("remote datachannel recv:" + JSON.stringify(event.data));
+        console.log(
+          "remote datachannel recv onmessage:" + JSON.stringify(event.data)
+        );
       };
     };
     pc.onicegatheringstatechange = function () {
