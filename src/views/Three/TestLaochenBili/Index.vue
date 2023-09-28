@@ -1,6 +1,8 @@
 <template>
-  <div>
-    <el-button class="btn_screen" type="primary">点击全屏</el-button>
+  <div class="threejs_demo">
+    <el-button class="btn_screen" type="primary">
+      {{ !isFullscreen ? "点击全屏" : "退出全屏" }}
+    </el-button>
     <div id="container"></div>
   </div>
 </template>
@@ -13,7 +15,9 @@ import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 
 export default {
   data() {
-    return {};
+    return {
+      isFullscreen: false,
+    };
   },
 
   mounted() {
@@ -118,12 +122,24 @@ export default {
       // btn.style.top = "10px";
       // btn.style.left = "10px";
       // btn.style.zIndex = "999";
-
+      const that = this;
       btn.onclick = function () {
-        // 全屏函数
-        renderer.domElement.requestFullscreen();
+        that.onClick();
       };
       // document.body.appendChild(btn);
+    },
+
+    onClick: function () {
+      if (!this.isFullscreen) {
+        // 全屏函数
+        // renderer.domElement.requestFullscreen(); // 画布全屏
+        document.body.requestFullscreen(); // 整个body 内容都会在全屏里
+      } else {
+        if (document.fullscreenElement) {
+          document.exitFullscreen();
+        }
+      }
+      this.isFullscreen = !this.isFullscreen;
     },
   },
 };
