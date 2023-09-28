@@ -53,7 +53,10 @@ export default {
       // 创建几何体
       const geometry = new THREE.BoxGeometry(1, 1, 1);
       // 创建材质
-      const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+      const material = new THREE.MeshBasicMaterial({
+        color: 0x00ff00,
+        wireframe: true,
+      });
       // 创建网络
       const cube = new THREE.Mesh(geometry, material);
 
