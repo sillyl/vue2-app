@@ -152,22 +152,30 @@ export default {
       gui.add(eventObj, "Fullscreen").name("全屏");
       gui.add(eventObj, "ExitFullscreen").name("退出全屏");
       // 控制立方体位置
-      // 方式1
-      gui.add(cube.position, "x", -5, 5).name("立方体x轴位置-方式1");
+      // // 方式1
+      // gui.add(cube.position, "x", -5, 5).name("立方体x轴位置-方式1");
       // 方式2
-      gui
+      // 创建一个folder
+      const folder = gui.addFolder("立方体位置");
+      folder
         .add(cube.position, "x")
         .min(-10)
         .max(10)
         .step(1)
-        .name("立方体x轴位置-方式2");
-      gui
+        .name("立方体x轴位置-方式2")
+        .onChange((val) => {
+          console.log("立方体x轴位置-", val);
+        })
+        .onFinishChange((val) => {
+          console.log("拖拽结束后才会触发", val);
+        }); // 其余可查看GUI API文档 https://lil-gui.georgealways.com/#API
+      folder
         .add(cube.position, "y")
         .min(-10)
         .max(10)
         .step(1)
         .name("立方体y轴位置-方式2");
-      gui
+      folder
         .add(cube.position, "z")
         .min(-10)
         .max(10)
