@@ -1,5 +1,8 @@
 <template>
-  <div id="container"></div>
+  <div>
+    <el-button class="btn_screen" type="primary">点击全屏</el-button>
+    <div id="container"></div>
+  </div>
 </template>
 
 <script>
@@ -96,6 +99,31 @@ export default {
       }
 
       animate();
+
+      // 监听窗口变化 窗口调整视口大小 canvas 自动调整
+      addEventListener("resize", () => {
+        // 重新渲染渲染器宽高比
+        renderer.setSize(container.clientWidth, container.clientHeight);
+        // 重置相机宽高比
+        camera.aspect = container.clientWidth / container.clientHeight;
+        // 更新相机投影矩阵
+        camera.updateProjectionMatrix();
+      });
+
+      // 全屏
+      const btn = document.querySelector(".btn_screen");
+      // const btn = document.createElement("button");
+      // btn.innerHTML = "点击全屏";
+      // btn.style.position = "absolute";
+      // btn.style.top = "10px";
+      // btn.style.left = "10px";
+      // btn.style.zIndex = "999";
+
+      btn.onclick = function () {
+        // 全屏函数
+        renderer.domElement.requestFullscreen();
+      };
+      // document.body.appendChild(btn);
     },
   },
 };
@@ -104,5 +132,11 @@ export default {
 #container {
   width: 100%;
   height: 100vh;
+}
+.btn_screen {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  z-index: 999;
 }
 </style>
