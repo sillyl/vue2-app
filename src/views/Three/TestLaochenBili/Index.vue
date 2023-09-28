@@ -13,6 +13,13 @@ import * as THREE from "three";
 // 导入轨道控制器 让立体 可拖动
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 
+// 导入lil.gui
+// 单独安装npm包的引入方式
+// import GUI from "lil-gui";
+// const gui = new GUI();
+// 不单独引入npm threejs 下会存在，如果单独npm安装threejs下则没有
+import { GUI } from "three/examples/jsm/libs/lil-gui.module.min.js";
+
 export default {
   data() {
     return {
@@ -127,6 +134,21 @@ export default {
         that.onClick();
       };
       // document.body.appendChild(btn);
+
+      // 定义事件对象
+
+      let eventObj = {
+        Fullscreen: function () {
+          document.body.requestFullscreen();
+        },
+        ExitFullscreen: function () {
+          document.exitFullscreen();
+        },
+      };
+
+      const gui = new GUI();
+      gui.add(eventObj, "Fullscreen").name("全屏");
+      gui.add(eventObj, "ExitFullscreen").name("退出全屏");
     },
 
     onClick: function () {
