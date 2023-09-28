@@ -80,6 +80,12 @@ const routes = [
     component: () => import(/* webpackChunkName: "webrtcSteamer" */ "@/components/Webrtc/Test.vue"),
   },
   {
+    path: "/TestLaochenBili",
+    name: "TestLaochenBili",
+    component: () => import(/* webpackChunkName: "webrtcSteamer" */ "@/views/Three/TestLaochenBili/Index.vue"),
+  },
+
+  {
     path: "/leaflet",
     name: "Leaflet",
     component: () => import(/* webpackChunkName: "Leaflet" */ "@/views/Leaflet/Index.vue"),
