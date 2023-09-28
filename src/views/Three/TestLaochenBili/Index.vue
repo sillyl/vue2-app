@@ -142,13 +142,37 @@ export default {
           document.body.requestFullscreen();
         },
         ExitFullscreen: function () {
-          document.exitFullscreen();
+          if (document.fullscreenElement) {
+            document.exitFullscreen();
+          }
         },
       };
 
       const gui = new GUI();
       gui.add(eventObj, "Fullscreen").name("全屏");
       gui.add(eventObj, "ExitFullscreen").name("退出全屏");
+      // 控制立方体位置
+      // 方式1
+      gui.add(cube.position, "x", -5, 5).name("立方体x轴位置-方式1");
+      // 方式2
+      gui
+        .add(cube.position, "x")
+        .min(-10)
+        .max(10)
+        .step(1)
+        .name("立方体x轴位置-方式2");
+      gui
+        .add(cube.position, "y")
+        .min(-10)
+        .max(10)
+        .step(1)
+        .name("立方体y轴位置-方式2");
+      gui
+        .add(cube.position, "z")
+        .min(-10)
+        .max(10)
+        .step(1)
+        .name("立方体z轴位置-方式2");
     },
 
     onClick: function () {
