@@ -60,6 +60,9 @@ export default {
       // 创建有层级的cube
       const parentMaterial = new THREE.MeshBasicMaterial({ color: 0x0000ff });
       let parentCube = new THREE.Mesh(geometry, parentMaterial);
+      // 设置父元素材质为线框模式
+      // parentMaterial.wireframe = true;
+
       parentCube.add(cube);
 
       // 设置父元素的位置
@@ -181,6 +184,35 @@ export default {
         .max(10)
         .step(1)
         .name("立方体z轴位置-方式2");
+
+      gui.add(parentMaterial, "wireframe").name("父元素线框模式"); // Boolean值 会展示checkbox
+
+      // 利用GUI 控制cube 颜色，这里需要注意threejs接受的颜色格式
+      let colorParams = {
+        cssColor: "#00ff00",
+        // 格式必须是字符串"rgb(r%, g%, b%)"，并且r, g, b 三者还都是是整数
+        // rgbColor: { r: 0, g: 255, b: 0 },
+        rgbColor: "rgb(0, 255, 0)",
+        customRange: [0, 255, 0],
+      };
+
+      const folderColor = gui.addFolder("cube子元素样式控制");
+
+      folderColor.addColor(colorParams, "cssColor").onChange((val) => {
+        cube.material.color.set(val);
+      });
+      folderColor.addColor(colorParams, "rgbColor").onChange((val) => {
+        const { r, g, b } = val;
+        // const str = `rgb(${(r * 100).toFixed(0)}%, ${(g * 100).toFixed(0)}%, ${(
+        //   b * 100
+        // ).toFixed(0)}%)`;
+        // cube.material.color.set(str);
+        cube.material.color.set(val);
+      });
+      folderColor.addColor(colorParams, "customRange", 255).onChange((val) => {
+        const str = `rgb(${val[0]}, ${val[1]}, ${val[2]})`;
+        cube.material.color.set(str);
+      });
     },
 
     onClick: function () {
