@@ -82,7 +82,7 @@ const routes = [
   {
     path: "/TestLaochenBili",
     name: "TestLaochenBili",
-    component: () => import(/* webpackChunkName: "webrtcSteamer" */ "@/views/Three/TestLaochenBili/Index.vue"),
+    component: () => import(/* webpackChunkName: "webrtcSteamer" */ "@/views/Three/TestLaochenBili/Index1.vue"),
   },
 
   {
