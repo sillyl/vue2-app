@@ -67,7 +67,7 @@ const routes = [
   {
     path: "/videoPlayerTest",
     name: "VideoPlayerTest",
-    component: () => import(/* webpackChunkName: "VideoPlayer" */ "@/components/VideoPlayer/Test.vue"),
+    component: () => import(/* webpackChunkName: "VideoPlayer" */ "@/components/VideoPlay/JMuxerVideo.vue"),
   },
   {
     path: "/webrtcSteamer",

@@ -2986,6 +2986,11 @@ element-ui@^2.15.13:
     resize-observer-polyfill "^1.5.0"
     throttle-debounce "^1.0.1"
 
+emitter-component@^1.1.1:
+  version "1.1.1"
+  resolved "https://registry.npmmirror.com/emitter-component/-/emitter-component-1.1.1.tgz#065e2dbed6959bf470679edabeaf7981d1003ab6"
+  integrity sha512-G+mpdiAySMuB7kesVRLuyvYRqDmshB7ReKEVuyBPkzQlmiDiLrt7hHHIy4Aff552bgknVN7B2/d3lzhGO5dvpQ==
+
 emoji-regex@^8.0.0:
   version "8.0.0"
   resolved "https://registry.npmmirror.com/emoji-regex/-/emoji-regex-8.0.0.tgz#e818fd69ce5ccfcb404594f842963bf53164cc37"
@@ -4123,6 +4128,11 @@ jest-worker@^28.0.2:
     "@types/node" "*"
     merge-stream "^2.0.0"
     supports-color "^8.0.0"
+
+jmuxer@^2.0.5:
+  version "2.0.5"
+  resolved "https://registry.npmmirror.com/jmuxer/-/jmuxer-2.0.5.tgz#36328afb8412fd13e37725d410e3c39c00cb9a33"
+  integrity sha512-4qjXl8JS138WyCZZoOYwXq/qVrHcE0UIpt2lMtGyq2wuBSPMNSzP1K2CEWSrwAMgjZ9jD7Btc0SxMkiLIhoHsg==
 
 joi@^17.4.0:
   version "17.10.2"
@@ -6009,6 +6019,13 @@ stream-shift@^1.0.0:
   version "1.0.1"
   resolved "https://registry.npmmirror.com/stream-shift/-/stream-shift-1.0.1.tgz#d7088281559ab2778424279b0877da3c392d5a3d"
   integrity sha512-AiisoFqQ0vbGcZgQPY1cdP2I76glaVA/RauYR4G4thNFgkTqr90yXTo4LYX60Jl+sIlPNHHdGSwo01AvbKUSVQ==
+
+stream@^0.0.2:
+  version "0.0.2"
+  resolved "https://registry.npmmirror.com/stream/-/stream-0.0.2.tgz#7f5363f057f6592c5595f00bc80a27f5cec1f0ef"
+  integrity sha512-gCq3NDI2P35B2n6t76YJuOp7d6cN/C7Rt0577l91wllh0sY9ZBuw9KaSGqH/b0hzn3CWWJbpbW0W0WvQ1H/Q7g==
+  dependencies:
+    emitter-component "^1.1.1"
 
 string-width@^2.1.1:
   version "2.1.1"
