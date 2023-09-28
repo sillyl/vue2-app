@@ -50,11 +50,15 @@ export default {
 
       // 设置父元素的位置
       parentCube.position.set(-3, 0, 0);
+      parentCube.rotation.x = Math.PI / 4;
 
       cube.position.set(3, 0, 0); // cube 子元素相对于 父元素parentCube的坐标位置
       // parentCube.scale.set(2, 2, 2);
       // // 设置立方体缩放 相对于父元素
       // cube.scale.set(2, 2, 2); // 子元素cube 其实被放大了4倍数
+
+      // 绕x 轴旋转 局部旋转和父元素相关
+      cube.rotation.x = Math.PI / 4; // 此时子元素cube 旋转 （Math.PI / 4 ）*2
 
       // 将网络添加到场景中
       // scene.add(cube);
