@@ -70,6 +70,11 @@ const routes = [
     component: () => import(/* webpackChunkName: "VideoPlayer" */ "@/components/VideoPlay/JMuxerVideo.vue"),
   },
   {
+    path: "/h264LivePlayer",
+    name: "h264LivePlayer",
+    component: () => import(/* webpackChunkName: "VideoPlayer" */ "@/components/h264LivePlayer/Index.vue"),
+  },
+  {
     path: "/webrtcSteamer",
     name: "webrtcSteamer",
     component: () => import(/* webpackChunkName: "webrtcSteamer" */ "@/views/ShowWebrtc/Index.vue"),
@@ -82,9 +87,14 @@ const routes = [
   {
     path: "/TestLaochenBili",
     name: "TestLaochenBili",
-    component: () => import(/* webpackChunkName: "webrtcSteamer" */ "@/views/Three/TestLaochenBili/MeshBasicMaterial.vue"),
+    component: () => import(/* webpackChunkName: "THREE" */ "@/views/Three/TestExampleWebgl1.vue"),
+    // component: () => import(/* webpackChunkName: "THREE" */ "@/views/Three/TestLaochenBili/MeshBasicMaterialLight.vue"),
   },
-
+  {
+    path: "/TestExampleWebglObj",
+    name: "TestExampleWebglObj",
+    component: () => import(/* webpackChunkName: "THREE" */ "@/views/Three/TestExampleWebglObj.vue"),
+  },
   {
     path: "/leaflet",
     name: "Leaflet",

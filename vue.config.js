@@ -27,6 +27,9 @@ module.exports = defineConfig({
     //   },
     // },
   },
+  configureWebpack: {
+    devtool: "source-map",
+  },
   // 按需加载lodash
   chainWebpack: (config) => {
     // config.plugin("loadshReplace").use(new LodashModuleReplacementPlugin());
