@@ -13,18 +13,15 @@ import { OBJLoader } from "three/examples/jsm/loaders/OBJLoader";
 
 export default {
   data() {
-    return {
-      container: null,
-      controls: null,
-      object: null,
-      camera: null,
-      scene: null,
-      renderer: null,
-    };
+    return {};
   },
   mounted() {
     this.container;
-    this.controls, this.object, this.camera, this.scene, this.renderer;
+    this.controls;
+    this.object;
+    this.camera;
+    this.scene;
+    this.renderer;
     this.daeFun();
   },
   methods: {
