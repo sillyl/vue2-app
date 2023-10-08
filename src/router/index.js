@@ -103,17 +103,17 @@ const routes = [
   {
     path: "/three",
     name: "Three",
-    component: () => import(/* webpackChunkName: "Three" */ "@/views/Three/Index.vue"),
+    component: () => import(/* webpackChunkName: "ThreePage" */ "@/views/Three/Index.vue"),
   },
   {
     path: "/three/test",
     name: "Three",
-    component: () => import(/* webpackChunkName: "Three" */ "@/views/Three/Test.vue"),
+    component: () => import(/* webpackChunkName: "ThreePage" */ "@/views/Three/Test.vue"),
   },
   {
     path: "/three/testone",
     name: "Three",
-    component: () => import(/* webpackChunkName: "Three" */ "@/views/Three/TestOne/TestOne.vue"),
+    component: () => import(/* webpackChunkName: "ThreePage" */ "@/views/Three/TestOne/TestOne.vue"),
   },
   {
     path: "/terminal",
