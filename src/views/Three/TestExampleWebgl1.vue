@@ -38,7 +38,6 @@ export default {
             child.material.flatShading = true;
           }
         });
-
         dae.scale.x = dae.scale.y = dae.scale.z = 7.0;
         dae.updateMatrix();
 
@@ -50,9 +49,12 @@ export default {
         requestAnimationFrame(animate);
 
         const timer = Date.now() * 0.0001;
-        camera.position.x = Math.cos(timer) * 20;
+        // camera.position.x = Math.cos(timer) * 20;
+        // camera.position.y = 10;
+        // camera.position.z = Math.sin(timer) * 20;
+        camera.position.x = 10;
         camera.position.y = 10;
-        camera.position.z = Math.sin(timer) * 20;
+        camera.position.z = 10;
         camera.lookAt(0, 5, 0);
         renderer.render(scene, camera);
         // stats.update();
@@ -106,6 +108,7 @@ export default {
               if (!kinematics.joints[prop].static) {
                 const joint = kinematics.joints[prop];
                 const old = tweenParameters[prop];
+                console.log("prop old", prop, old);
                 const position = old ? old : joint.zeroPosition;
                 tweenParameters[prop] = position;
                 target[prop] = THREE.MathUtils.randInt(
@@ -115,6 +118,7 @@ export default {
               }
             }
           }
+          console.log("tweenParameters", tweenParameters, target, duration);
           kinematicsTween = new TWEEN.Tween(tweenParameters)
             .to(target, duration)
             .easing(TWEEN.Easing.Quadratic.Out);
@@ -127,8 +131,10 @@ export default {
               }
             }
           });
+
+          // 启动补间动画
           kinematicsTween.start();
-          setTimeout(setupTween, duration);
+          // setTimeout(setupTween, duration);
         }
         setupTween();
 
@@ -136,7 +142,6 @@ export default {
         window.addEventListener("resize", onWindowResize);
       }
     },
-    init: function () {},
   },
 };
 </script>
