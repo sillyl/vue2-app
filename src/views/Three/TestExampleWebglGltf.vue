@@ -13,7 +13,7 @@ import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 import { DRACOLoader } from "three/examples/jsm/loaders/DRACOLoader.js";
 
 // const clock = new THREE.Clock();
-
+let INTERSECTED;
 export default {
   data() {
     return {};
@@ -84,6 +84,7 @@ export default {
           antialias: true,
           alpha: true,
         });
+        that.renderer.outputEncoding = THREE.sRGBEncoding;
         that.renderer.setClearColor(0x000, 0);
         that.renderer.setPixelRatio(window.devicePixelRatio);
         that.renderer.setSize(
@@ -135,6 +136,51 @@ export default {
             that.container.clientWidth / that.container.clientHeight;
           // 更新相机投影矩阵
           that.camera.updateProjectionMatrix();
+        });
+
+        // 创建射线
+        const raycaster = new THREE.Raycaster();
+        // 创建鼠标向量
+        const mouse = new THREE.Vector2();
+
+        //  创建点击事件
+        window.addEventListener("click", (e) => {
+          console.log("点击修改颜色之前", that.scene);
+          // console.log(e, "e");
+          const clientX = e.clientX;
+          const clientY = e.clientY;
+          // 设置鼠标向量的x,y值
+          mouse.x = (clientX / that.container.clientWidth) * 2 - 1;
+          mouse.y = -((clientY / that.container.clientHeight) * 2 - 1);
+          // console.log("mouse", mouse);
+
+          // 通过摄像机和鼠标位置更新射线
+          raycaster.setFromCamera(mouse, that.camera);
+
+          // 计算射线和物体的焦点
+          const shpereArr = that.scene.children[2].children; //获取Mesh
+          const intersects = raycaster.intersectObjects(shpereArr, false);
+          console.log(intersects);
+          // 下面逻辑会导致点击 所有的材质颜色都会更新，原因可能有两条：
+          // 1. 两个模型共享的同一个材质，对材质的任何修改都会同时反应在两个模型上。
+          // 2. 两个mesh共享一个材质，改变一个mesh的颜色，另一个mesh2的颜色也会跟着改变
+
+          if (intersects.length > 0) {
+            if (INTERSECTED != intersects[0].object) {
+              if (INTERSECTED)
+                INTERSECTED.material.emissive.setHex(INTERSECTED.currentHex);
+
+              INTERSECTED = intersects[0].object;
+              INTERSECTED.currentHex = INTERSECTED.material.emissive.getHex();
+              INTERSECTED.material.emissive.setHex(0xff0000);
+            }
+          } else {
+            if (INTERSECTED)
+              INTERSECTED.material.emissive.setHex(INTERSECTED.currentHex);
+
+            INTERSECTED = null;
+          }
+          console.log("点击修改颜色之后", that.scene, "intersects", intersects);
         });
       }
     },
