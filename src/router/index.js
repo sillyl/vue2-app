@@ -87,18 +87,22 @@ const routes = [
   {
     path: "/TestLaochenBili",
     name: "TestLaochenBili",
-    component: () => import(/* webpackChunkName: "THREE" */ "@/views/Three/TestExampleWebgl1.vue"),
-    // component: () => import(/* webpackChunkName: "THREE" */ "@/views/Three/TestLaochenBili/MeshBasicMaterialLight.vue"),
+    component: () => import(/* webpackChunkName: "ThreePage" */ "@/views/Three/TestLaochenBili/Raycaster.vue"),
+  },
+  {
+    path: "/TestExampleWebglDae",
+    name: "TestExampleWebglDae",
+    component: () => import(/* webpackChunkName: "ThreePage" */ "@/views/Three/TestExampleWebglObj.vue"),
   },
   {
     path: "/TestExampleWebglObj",
     name: "TestExampleWebglObj",
-    component: () => import(/* webpackChunkName: "THREE" */ "@/views/Three/TestExampleWebglObj.vue"),
+    component: () => import(/* webpackChunkName: "ThreePage" */ "@/views/Three/TestExampleWebglObj.vue"),
   },
   {
     path: "/TestExampleWebglGltf",
     name: "TestExampleWebglGltf",
-    component: () => import(/* webpackChunkName: "THREE" */ "@/views/Three/TestExampleWebglGltf.vue"),
+    component: () => import(/* webpackChunkName: "ThreePage" */ "@/views/Three/TestExampleWebglGltf.vue"),
   },
   {
     path: "/leaflet",
