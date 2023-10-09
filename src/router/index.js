@@ -96,6 +96,11 @@ const routes = [
     component: () => import(/* webpackChunkName: "THREE" */ "@/views/Three/TestExampleWebglObj.vue"),
   },
   {
+    path: "/TestExampleWebglGltf",
+    name: "TestExampleWebglGltf",
+    component: () => import(/* webpackChunkName: "THREE" */ "@/views/Three/TestExampleWebglGltf.vue"),
+  },
+  {
     path: "/leaflet",
     name: "Leaflet",
     component: () => import(/* webpackChunkName: "Leaflet" */ "@/views/Leaflet/Index.vue"),

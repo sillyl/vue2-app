@@ -9,6 +9,9 @@ import { ColladaLoader } from "three/examples/jsm/loaders/ColladaLoader.js";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import { OBJLoader } from "three/examples/jsm/loaders/OBJLoader";
 
+// 导入draco解码器
+import { DRACOLoader } from "three/examples/jsm/loaders/DRACOLoader.js";
+
 // const clock = new THREE.Clock();
 
 export default {
@@ -56,6 +59,7 @@ export default {
                 child.material.flatShading = true;
               }
             });
+            console.log("objobj", obj);
             that.scene.add(that.object);
           },
           (xhr) => {
@@ -65,6 +69,11 @@ export default {
             console.log("An error happened");
           }
         );
+
+        // // 实例化加载器DRACOLoader
+        // const dracoLoader = new DRACOLoader();
+        // dracoLoader.setDecoderPath("./draco/");
+        // loader.setDRACOLoader(dracoLoader);
 
         // Lights
         const light = new THREE.HemisphereLight(0x005, 0x696969, 0.5);

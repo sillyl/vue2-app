@@ -57,7 +57,7 @@ export default {
         camera.position.z = 10;
         camera.lookAt(0, 5, 0);
         renderer.render(scene, camera);
-        // stats.update();
+        stats.update();
         TWEEN.update();
       }
 
@@ -89,9 +89,9 @@ export default {
         renderer.setSize(container.clientWidth, container.clientHeight);
         container.appendChild(renderer.domElement);
 
-        // stats = new Stats();
-        // console.log("ppp", stats);
-        // container.appendChild(stats.dom);
+        stats = new Stats();
+        console.log("ppp", stats);
+        container.appendChild(stats.dom);
 
         function onWindowResize() {
           camera.aspect = window.innerWidth / window.innerHeight;
@@ -134,7 +134,7 @@ export default {
 
           // 启动补间动画
           kinematicsTween.start();
-          // setTimeout(setupTween, duration);
+          setTimeout(setupTween, duration);
         }
         setupTween();
 
