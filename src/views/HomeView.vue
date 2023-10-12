@@ -2,7 +2,7 @@
   <div class="home">
     <!-- <Konva /> -->
     <!-- <PgmKonva /> -->
-    <VideoPlayer :src="videoUrl" />
+    <VideoPlayer :src="videoUrl" :isShow="true" />
   </div>
 </template>
 
@@ -10,6 +10,7 @@
 import Konva from "@/components/Konva/Index.vue";
 import PgmKonva from "./PgmKonva/Index.vue";
 import VideoPlayer from "@/components/VideoPlayer/Index.vue";
+// import VideoPlayer from "@/components/Wfs/Index.vue";
 
 export default {
   name: "HomeView",

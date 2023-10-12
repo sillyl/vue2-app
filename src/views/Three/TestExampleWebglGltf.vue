@@ -167,18 +167,19 @@ export default {
 
           if (intersects.length > 0) {
             if (INTERSECTED != intersects[0].object) {
-              if (INTERSECTED)
+              if (INTERSECTED) {
                 INTERSECTED.material.emissive.setHex(INTERSECTED.currentHex);
 
-              INTERSECTED = intersects[0].object;
-              INTERSECTED.currentHex = INTERSECTED.material.emissive.getHex();
-              INTERSECTED.material.emissive.setHex(0xff0000);
+                INTERSECTED = intersects[0].object;
+                INTERSECTED.currentHex = INTERSECTED.material.emissive.getHex();
+                INTERSECTED.material.emissive.setHex(0xff0000);
+              }
             }
           } else {
-            if (INTERSECTED)
+            if (INTERSECTED) {
               INTERSECTED.material.emissive.setHex(INTERSECTED.currentHex);
-
-            INTERSECTED = null;
+              INTERSECTED = null;
+            }
           }
           console.log("点击修改颜色之后", that.scene, "intersects", intersects);
         });

@@ -1,62 +1,54 @@
 <template>
-  <div
-    class="video-player"
-    id="video-player"
-    :style="{ top: top + 'px', left: left + 'px' }"
-    v-if="isShow"
-  >
-    <div
-      class="video-player-header"
-      id="video-player-header"
-      @mousedown="onCircleMousedown"
-    >
-      <span class="video-player-header-x" @click="onClickClosed">x</span>
-    </div>
-    <div class="video-player-content" @click="onClickVideo">
-      <video
-        :id="id"
-        ref="video"
-        muted
-        autoplay
-        controls="controls"
-        disablePictureInPicture
-        controlsList="nodownload noremoteplayback noplaybackrate"
-        src="http://localhost:9000/cc"
-        style="width: 100%; height: 100%"
+  <div class="video_player_wfs" :id="videoId" :style="{ top, left }">
+    <div class="video_player_wfs_header" @mousedown="onCircleMousedown(id)">
+      <span>{{ videoCheckBox[id] }}</span>
+      <span
+        v-if="!isFullScreen"
+        class="video_player_wfs_header-x"
+        @click="onClickClosed($event, id)"
+        >x</span
       >
-        <!-- src="https://video.pearvideo.com/mp4/short/20200209/cont-1650197-14888002-hd.mp4" -->
-        <track srclang="zh-cn" kind="subtitles" default src="./fractions.vtt" />
+    </div>
+    <div
+      class="video_player_wfs_content"
+      :id="'video_player_wfs_content_' + id"
+    >
+      <video :id="id" muted autoplay crossorigin>
         你的浏览器不支持 video 标签
       </video>
+      <i
+        :class="[isFullScreen ? 'icon-shrink' : 'icon-enlarge']"
+        @click="onIsFullScereen(id)"
+      />
     </div>
   </div>
 </template>
+
 <script>
-/* 
-  nodownload 隐藏下载
-  nofullscreen 隐藏全屏
-  noplaybackrate 隐藏播放速度
-  noremoteplayback 隐藏远程回放
-  disablePictureInPicture 禁用画中画
-*/
+import { videoCheckBox } from "@/constants";
 export default {
-  props: ["videoId", "isShow"],
+  props: ["id", "curTop", "curLeft"],
   data() {
     return {
-      id: this.videoId || "video-id",
-      top: 0,
-      left: 0,
-      isFull: false,
-      isClosed: this.isShow || false,
+      videoId: `video_player_wfs_${this.id}` || "video_player_wfs",
+      top: this.curTop || "0px",
+      left: this.curLeft || "30%",
+      videoCheckBox,
+      isFullScreen: false,
     };
   },
+  mounted() {
+    this.startWfs();
+  },
   methods: {
-    onClickClosed: function () {
-      const dom = document.getElementById("video-player");
+    onClickClosed: function (e, id) {
+      e.stopPropagation();
+      const dom = document.getElementById(`video_player_wfs_${id}`);
       dom.style.display = "none";
+      this.$emit("closedVideoId", id);
     },
-    onCircleMousedown: function () {
-      const dom = document.getElementById("video-player-header");
+    onCircleMousedown: function (id) {
+      const dom = document.getElementById(`video_player_wfs_${id}`);
       let width = 300 / 2;
       let height = 200 / 2;
       if (dom) {
@@ -64,31 +56,50 @@ export default {
         height = dom.offsetHeight / 2;
       }
       (document.onmousemove = (el) => {
-        this.left = el.clientX - width; // 保持中心位置拖拽
-        this.top = el.clientY - height;
+        this.left = el.clientX - width + "px"; // 保持中心位置拖拽
+        this.top = el.clientY - height + "px";
       }),
         (document.onmouseup = () => {
           document.onmousemove = null;
         });
     },
-    onClickVideo: function () {
-      console.log("this.$ref", this.$refs.video.style);
-      if (this.$refs.video) {
-        const wid = this.$refs.video.videoWidth;
+
+    onIsFullScereen: function (id) {
+      if (!this.isFullScreen) {
+        const dom = document.querySelector(`#${this.videoId}`);
+        dom.requestFullscreen();
+      } else {
+        if (document.fullscreenElement) {
+          document.exitFullscreen();
+        }
+      }
+      this.isFullScreen = !this.isFullScreen;
+    },
+    startWfs: function () {
+      if (Wfs.isSupported()) {
+        const videoFps = 35;
+        const videoDom = document.querySelector(`#${this.id}`);
+        const wfs = new Wfs();
+        wfs.attachMedia(
+          videoDom,
+          "3-0",
+          "H264Raw",
+          "ws://localhost:8090/cpix/v1.0/websocket/device-video/3-0",
+          videoFps
+        );
       }
     },
   },
 };
 </script>
 <style lang="scss" scoped>
-$className: "video-player";
-.#{$className} {
+$prefixCls: "video_player_wfs";
+.#{$prefixCls} {
   width: 300px;
   border: 1px solid rgb(58, 58, 68);
   position: absolute;
   cursor: pointer;
-  &-header {
-    width: 300px;
+  &_header {
     height: 32px;
     line-height: 32px;
     text-align: center;
@@ -97,19 +108,24 @@ $className: "video-player";
     &-x {
       float: right;
       margin: 0 16px;
+      font-size: 20px;
     }
   }
-  &-content {
-    position: relative;
+
+  &_content {
+    background: rgb(54, 54, 54);
+    height: calc(100% - 32px);
+    video {
+      width: 100%;
+      height: 100%;
+    }
+    i {
+      bottom: 10px;
+      position: absolute;
+      right: 8px;
+      color: #ccc;
+      font-size: 20px;
+    }
   }
-}
-video::-webkit-media-controls-mute-button,
-video::-webkit-media-controls-time-remaining-display,
-video::-webkit-media-controls-current-time-display,
-video::-webkit-media-controls-play-button,
-video::-webkit-media-controls-timeline,
-video::-webkit-media-controls-volume-control-hover-background,
-video::-webkit-media-controls-volume-slider {
-  display: none;
 }
 </style>
