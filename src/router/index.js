@@ -130,6 +130,11 @@ const routes = [
     component: () => import(/* webpackChunkName: "VideoPlayer" */ "@/components/Terminal/Index.vue"),
   },
   {
+    path: "/layoutDrag",
+    name: "LayoutDrag",
+    component: () => import(/* webpackChunkName: "LayoutDrag" */ "@/views/Drag/Test.vue"),
+  },
+  {
     path: '/notFound',
     name: 'NotFound',
     meta: {
