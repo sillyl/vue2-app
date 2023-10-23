@@ -39,6 +39,7 @@
     "vue-konva": "2",
     "vue-router": "^3.5.1",
     "vue-video-player": "4.0.6",
+    "vuedraggable": "^2.24.3",
     "vuex": "^3.6.2",
     "websocket-stream": "^5.5.2",
     "ws": "^8.14.1",

@@ -30,7 +30,7 @@ export default {
   props: ["id", "curTop", "curLeft"],
   data() {
     return {
-      videoId: `video_player_wfs_${this.id}` || "video_player_wfs",
+      videoId: this.id ? `video_player_wfs_${this.id}` : "video_player_wfs",
       top: this.curTop || "0px",
       left: this.curLeft || "30%",
       videoCheckBox,
