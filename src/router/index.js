@@ -115,9 +115,9 @@ const routes = [
     component: () => import(/* webpackChunkName: "ThreePage" */ "@/views/Three/Index.vue"),
   },
   {
-    path: "/three/test",
+    path: "/three/Dianyun",
     name: "Three",
-    component: () => import(/* webpackChunkName: "ThreePage" */ "@/views/Three/Test.vue"),
+    component: () => import(/* webpackChunkName: "ThreePage" */ "@/views/Three/Dianyun.vue"),
   },
   {
     path: "/three/testone",
