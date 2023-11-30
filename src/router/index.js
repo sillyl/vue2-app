@@ -140,6 +140,12 @@ const routes = [
     component: () => import(/* webpackChunkName: "EllipseOrbit" */ "@/views/EllipseOrbit/Index.vue"),
   },
   {
+    path:'/videoSave',
+    name:"VideoSave",
+    component: () => import(/* webpackChunkName: "VideoSave" */ "@/components/VideoSave/Index.vue"),
+  },
+  
+  {
     path: '/notFound',
     name: 'NotFound',
     meta: {
