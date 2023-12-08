@@ -6,9 +6,11 @@
       allow="autoplay; fullscreen"
     ></iframe>
     <canvas id="cvs"></canvas>
-    <button type="button" onclick="wsavc.playStream()">Start Video</button>
-    <button type="button" onclick="wsavc.stopStream()">Stop Video</button>
-    <button type="button" onclick="wsavc.disconnect()">Disconnect</button>
+    <el-button type="button" onclick="wsavc.playStream()"
+      >Start Video</el-button
+    >
+    <el-button type="button" onclick="wsavc.stopStream()">Stop Video</el-button>
+    <el-button type="button" onclick="wsavc.disconnect()">Disconnect</el-button>
   </div>
 </template>
 <script>

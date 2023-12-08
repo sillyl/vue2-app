@@ -8,9 +8,9 @@
       <a>input rtsp url:</a
       ><input type="text" v-model="rtspUrl" placeholder="请输入rtsp流地址" />
     </div>
-    <button style="margin-top: 15px" @click="playVideo">
+    <el-button style="margin-top: 15px" @click="playVideo">
       准备好了点击播放视频
-    </button>
+    </el-button>
     <div class="videoPlay">
       <video
         id="video"

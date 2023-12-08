@@ -24,9 +24,9 @@
             />
           </svg>
         </div>
-        <button class="toggle-button">
+        <el-button class="toggle-button">
           <div class="toggle-circle"></div>
-        </button>
+        </el-button>
         <div class="moon-wrapper">
           <svg xmlns="http://www.w3.org/2000/svg" height="24" width="24">
             <path

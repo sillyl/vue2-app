@@ -455,7 +455,7 @@ export default {
       //   strHex += arrHex[index];
       // }
       // console.log(strHex,'strHex');
-      let strHex = 0xffffff;
+      let strHex = 0x000;
       return strHex;
     },
     //初始化性能插件

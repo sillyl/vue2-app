@@ -22,9 +22,9 @@
       </div>
     </div>
     <div class="buttonWrapper">
-      <button class="btn btn-primary" type="button" @click="enterStream">
+      <el-button class="btn btn-primary" type="button" @click="enterStream">
         Apply
-      </button>
+      </el-button>
     </div>
   </div>
 </template>

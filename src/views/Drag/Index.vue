@@ -31,14 +31,14 @@
             :key="index"
           >
             <div class="moveDialog">
-              <Button
+              <el-button
                 type="primary"
                 size="small"
                 class="edit"
                 @click="edit(item)"
                 >编 辑</Button
               >
-              <Button type="primary" size="small" class="del" @click="del(item)"
+              <el-button type="primary" size="small" class="del" @click="del(item)"
                 >删 除</Button
               >
             </div>
@@ -89,8 +89,8 @@
         *（提示：以上给出的是较为合适的宽高比例，可酌情调整，不建议暴力调整比例。）
       </p>
       <div slot="footer" align="right">
-        <Button @click="handleCancelEdit">取 消</Button>
-        <Button type="primary" @click="submitFormEdit">确 定</Button>
+        <el-button @click="handleCancelEdit">取 消</el-button>
+        <el-button type="primary" @click="submitFormEdit">确 定</el-button>
       </div>
     </el-dialog>
   </div>

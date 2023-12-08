@@ -144,7 +144,11 @@ const routes = [
     name:"VideoSave",
     component: () => import(/* webpackChunkName: "VideoSave" */ "@/components/VideoSave/Index.vue"),
   },
-  
+  {
+    path: "/speechSynthesisUtterance",
+    name: "SpeechSynthesisUtterance",
+    component: () => import(/* webpackChunkName: "SpeechSynthesisUtterance" */ "@/views/SpeechSynthesisUtterance/Index.vue"),
+  },
   {
     path: '/notFound',
     name: 'NotFound',

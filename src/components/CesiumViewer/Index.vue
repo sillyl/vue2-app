@@ -1,10 +1,10 @@
 <template>
   <div id="cesiumContainer" @dragover="allowDrop" @drop="drop">
     <nav>
-      <button @click="draw('point')">点绘制</button>
-      <button @click="draw('polyline')">线绘制</button>
-      <button @click="draw('polygon')">圆绘制</button>
-      <button @click="clearDrawEntities">清空</button>
+      <el-button @click="draw('point')">点绘制</el-button>
+      <el-button @click="draw('polyline')">线绘制</el-button>
+      <el-button @click="draw('polygon')">圆绘制</el-button>
+      <el-button @click="clearDrawEntities">清空</el-button>
     </nav>
   </div>
 </template>
