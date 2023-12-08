@@ -150,6 +150,11 @@ const routes = [
     component: () => import(/* webpackChunkName: "SpeechSynthesisUtterance" */ "@/views/SpeechSynthesisUtterance/Index.vue"),
   },
   {
+    path: "/svgView",
+    name: "SvgView",
+    component: () => import(/* webpackChunkName: " SvgView" */ "@/views/SvgView/Index.vue"),
+  },
+  {
     path: '/notFound',
     name: 'NotFound',
     meta: {
