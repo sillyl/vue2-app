@@ -132,7 +132,7 @@ const routes = [
   {
     path: "/layoutDrag",
     name: "LayoutDrag",
-    component: () => import(/* webpackChunkName: "LayoutDrag" */ "@/views/Drag/Test.vue"),
+    component: () => import(/* webpackChunkName: "LayoutDrag" */ "@/views/Drag/Index.vue"),
   },
   {
     path:'/ellipse-orbit',

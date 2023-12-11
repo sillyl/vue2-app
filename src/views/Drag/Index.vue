@@ -1,5 +1,8 @@
 <template>
   <div class="test">
+    <div class="theme">
+      <!--  -->
+    </div>
     <main>
       <draggable v-bind="dragOptions1" class="left" v-model="dataList">
         <div
@@ -36,10 +39,14 @@
                 size="small"
                 class="edit"
                 @click="edit(item)"
-                >编 辑</Button
+                >编 辑</el-button
               >
-              <el-button type="primary" size="small" class="del" @click="del(item)"
-                >删 除</Button
+              <el-button
+                type="primary"
+                size="small"
+                class="del"
+                @click="del(item)"
+                >删 除</el-button
               >
             </div>
             <components
@@ -52,7 +59,7 @@
       </div>
     </main>
     <el-dialog
-      v-model="editModal"
+      :visible.sync="editModal"
       class="edit-modal"
       :transfer="false"
       :title="`编辑组件信息`"
@@ -61,7 +68,7 @@
       :mask-closable="false"
     >
       <Form
-        ref="formValidate"
+        ref="formValidateRef"
         :model="formValidate"
         :label-width="100"
         :rules="ruleValidate"
@@ -108,7 +115,6 @@ import pink from "./Index1.vue";
 import fff from "./Index1.vue";
 import black from "./Index1.vue";
 export default {
-  name: "test",
   components: {
     red,
     orange,
@@ -281,6 +287,7 @@ export default {
     edit(row) {
       this.editModal = true;
       this.formValidate = JSON.parse(JSON.stringify(row));
+      console.log("this.formValidate", this.formValidate);
     },
     // 删除按钮
     del(data) {
@@ -292,7 +299,7 @@ export default {
     },
     // 编辑弹窗确定按钮
     submitFormEdit: function () {
-      this.$refs["formValidate"].validate((valid) => {
+      this.$refs["formValidateRef"]?.validate((valid) => {
         if (valid) {
           this.dataList2.map((item) => {
             if (item.chartId === this.formValidate.chartId) {
