@@ -11,6 +11,14 @@ const routes = [
     name: "home",
     component: HomeView,
   },
+  {
+    path: "/testCircle",
+    name: "TestCircle",
+    component: () =>
+      import(
+        /* webpackChuncName: "TestCircle"*/ "@/components/TestDiv/Index.vue"
+      ),
+  },
   // {
   //   path: "/about",
   //   name: "about",
