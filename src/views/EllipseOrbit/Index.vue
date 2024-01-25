@@ -39,8 +39,8 @@ export default {
     .xiaoche {
       width: 60px;
       position: absolute;
-      animation: animX 4000s cubic-bezier(0.36, 0, 0.64, 1) -2000s infinite alternate,
-        animY 4000s cubic-bezier(0.36, 0, 0.64, 1) 0s infinite alternate;
+      animation: animX 40s cubic-bezier(0.36, 0, 0.64, 1) -20s infinite alternate,
+        animY 40s cubic-bezier(0.36, 0, 0.64, 1) 0s infinite alternate;
     }
     @keyframes animX {
       0% {

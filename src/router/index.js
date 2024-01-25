@@ -31,7 +31,10 @@ const routes = [
   {
     path: "/cesiumViewer",
     name: "cesiumViewer",
-    component: () => import(/* webpackChunkName: "about" */ "@/components/CesiumViewer/Index.vue"),
+    component: () =>
+      import(
+        /* webpackChunkName: "about" */ "@/components/CesiumViewer/Index.vue"
+      ),
   },
   // {
   //   path: "/videoPlayer",
@@ -43,139 +46,204 @@ const routes = [
     path: "/wfs",
     name: "Wfs",
     // component: () => import(/* webpackChunkName: "about" */ "@/components/Wfs/Index.vue"),
-    component: () => import(/* webpackChunkName: "about" */ "@/views/Video/Index.vue"),
+    component: () =>
+      import(/* webpackChunkName: "about" */ "@/views/Video/Index.vue"),
   },
   {
     path: "/cssTest",
     name: "CssTest",
     // component: () => import(/* webpackChunkName: "about" */ "@/components/Wfs/Index.vue"),
-    component: () => import(/* webpackChunkName: "about" */ "@/components/cssTest/Index.vue"),
+    component: () =>
+      import(/* webpackChunkName: "about" */ "@/components/cssTest/Index.vue"),
   },
   {
     path: "/buttonOptions",
     name: "ButtonOptions",
     // component: () => import(/* webpackChunkName: "about" */ "@/components/Wfs/Index.vue"),
-    component: () => import(/* webpackChunkName: "about" */ "@/components/ButtonOptions/Demo.vue"),
+    component: () =>
+      import(
+        /* webpackChunkName: "about" */ "@/components/ButtonOptions/Demo.vue"
+      ),
   },
   {
     path: "/demo",
     name: "TreeTable",
-    component: () => import(/* webpackChunkName: "about" */ "@/components/TreeTable/demo.vue"),
+    component: () =>
+      import(/* webpackChunkName: "about" */ "@/components/TreeTable/demo.vue"),
   },
   {
     path: "/videoPlayer",
     name: "VideoPlayer",
-    component: () => import(/* webpackChunkName: "VideoPlayer" */ "@/components/VideoPlayer/Index.vue"),
+    component: () =>
+      import(
+        /* webpackChunkName: "VideoPlayer" */ "@/components/VideoPlayer/Index.vue"
+      ),
   },
   {
     path: "/videoPlayerDemo",
     name: "VideoPlayerDemo",
-    component: () => import(/* webpackChunkName: "VideoPlayer" */ "@/components/VideoPlayer/Demo.vue"),
+    component: () =>
+      import(
+        /* webpackChunkName: "VideoPlayer" */ "@/components/VideoPlayer/Demo.vue"
+      ),
   },
   {
     path: "/videoPlayerTest",
     name: "VideoPlayerTest",
-    component: () => import(/* webpackChunkName: "VideoPlayer" */ "@/components/VideoPlay/JMuxerVideo.vue"),
+    component: () =>
+      import(
+        /* webpackChunkName: "VideoPlayer" */ "@/components/VideoPlay/JMuxerVideo.vue"
+      ),
   },
   {
     path: "/h264LivePlayer",
     name: "h264LivePlayer",
-    component: () => import(/* webpackChunkName: "VideoPlayer" */ "@/components/h264LivePlayer/Index.vue"),
+    component: () =>
+      import(
+        /* webpackChunkName: "VideoPlayer" */ "@/components/h264LivePlayer/Index.vue"
+      ),
   },
   {
     path: "/webrtcSteamer",
     name: "webrtcSteamer",
-    component: () => import(/* webpackChunkName: "webrtcSteamer" */ "@/views/ShowWebrtc/Index.vue"),
+    component: () =>
+      import(
+        /* webpackChunkName: "webrtcSteamer" */ "@/views/ShowWebrtc/Index.vue"
+      ),
   },
   {
     path: "/webrtcSteamer_test",
     name: "webrtcSteamerTest",
-    component: () => import(/* webpackChunkName: "webrtcSteamer" */ "@/components/Webrtc/Test.vue"),
+    component: () =>
+      import(
+        /* webpackChunkName: "webrtcSteamer" */ "@/components/Webrtc/Test.vue"
+      ),
   },
   {
     path: "/TestLaochenBili",
     name: "TestLaochenBili",
-    component: () => import(/* webpackChunkName: "ThreePage" */ "@/views/Three/TestLaochenBili/Raycaster.vue"),
+    component: () =>
+      import(
+        /* webpackChunkName: "ThreePage" */ "@/views/Three/TestLaochenBili/Raycaster.vue"
+      ),
   },
   {
     path: "/TestExampleWebglDae",
     name: "TestExampleWebglDae",
-    component: () => import(/* webpackChunkName: "ThreePage" */ "@/views/Three/TestExampleWebglObj.vue"),
+    component: () =>
+      import(
+        /* webpackChunkName: "ThreePage" */ "@/views/Three/TestExampleWebglObj.vue"
+      ),
   },
   {
     path: "/TestExampleWebglObj",
     name: "TestExampleWebglObj",
-    component: () => import(/* webpackChunkName: "ThreePage" */ "@/views/Three/TestExampleWebglObj.vue"),
+    component: () =>
+      import(
+        /* webpackChunkName: "ThreePage" */ "@/views/Three/TestExampleWebglObj.vue"
+      ),
   },
   {
     path: "/TestExampleWebglGltf",
     name: "TestExampleWebglGltf",
-    component: () => import(/* webpackChunkName: "ThreePage" */ "@/views/Three/TestExampleWebglGltf.vue"),
+    component: () =>
+      import(
+        /* webpackChunkName: "ThreePage" */ "@/views/Three/TestExampleWebglGltf.vue"
+      ),
   },
   {
     path: "/leaflet",
     name: "Leaflet",
-    component: () => import(/* webpackChunkName: "Leaflet" */ "@/views/Leaflet/Index.vue"),
+    component: () =>
+      import(/* webpackChunkName: "Leaflet" */ "@/views/Leaflet/Index.vue"),
   },
   {
     path: "/three",
     name: "Three",
-    component: () => import(/* webpackChunkName: "ThreePage" */ "@/views/Three/Index.vue"),
+    component: () =>
+      import(/* webpackChunkName: "ThreePage" */ "@/views/Three/Index.vue"),
   },
   {
     path: "/three/Dianyun",
     name: "Three",
-    component: () => import(/* webpackChunkName: "ThreePage" */ "@/views/Three/Dianyun.vue"),
+    component: () =>
+      import(/* webpackChunkName: "ThreePage" */ "@/views/Three/Dianyun.vue"),
   },
   {
     path: "/three/testone",
     name: "Three",
-    component: () => import(/* webpackChunkName: "ThreePage" */ "@/views/Three/TestOne/TestOne.vue"),
+    component: () =>
+      import(
+        /* webpackChunkName: "ThreePage" */ "@/views/Three/TestOne/TestOne.vue"
+      ),
   },
   {
     path: "/terminal",
     name: "Terminal",
-    component: () => import(/* webpackChunkName: "VideoPlayer" */ "@/components/Terminal/Index.vue"),
+    component: () =>
+      import(
+        /* webpackChunkName: "VideoPlayer" */ "@/components/Terminal/Index.vue"
+      ),
   },
   {
     path: "/layoutDrag",
     name: "LayoutDrag",
-    component: () => import(/* webpackChunkName: "LayoutDrag" */ "@/views/Drag/Index.vue"),
+    component: () =>
+      import(/* webpackChunkName: "LayoutDrag" */ "@/views/Drag/Index.vue"),
   },
   {
-    path:'/ellipse-orbit',
-    name:"EllipseOrbit",
-    component: () => import(/* webpackChunkName: "EllipseOrbit" */ "@/views/EllipseOrbit/Index.vue"),
+    path: "/ellipse-orbit",
+    name: "EllipseOrbit",
+    component: () =>
+      import(
+        /* webpackChunkName: "EllipseOrbit" */ "@/views/EllipseOrbit/Index.vue"
+      ),
   },
   {
-    path:'/videoSave',
-    name:"VideoSave",
-    component: () => import(/* webpackChunkName: "VideoSave" */ "@/components/VideoSave/Index.vue"),
+    path: "/videoSave",
+    name: "VideoSave",
+    component: () =>
+      import(
+        /* webpackChunkName: "VideoSave" */ "@/components/VideoSave/Index.vue"
+      ),
   },
   {
     path: "/speechSynthesisUtterance",
     name: "SpeechSynthesisUtterance",
-    component: () => import(/* webpackChunkName: "SpeechSynthesisUtterance" */ "@/views/SpeechSynthesisUtterance/Index.vue"),
+    component: () =>
+      import(
+        /* webpackChunkName: "SpeechSynthesisUtterance" */ "@/views/SpeechSynthesisUtterance/Index.vue"
+      ),
   },
   {
     path: "/svgView",
     name: "SvgView",
-    component: () => import(/* webpackChunkName: " SvgView" */ "@/views/SvgView/Index.vue"),
+    component: () =>
+      import(/* webpackChunkName: "SvgView" */ "@/views/SvgView/Index.vue"),
   },
   {
-    path: '/notFound',
-    name: 'NotFound',
+    path: "/circle",
+    name: "Circle",
+    component: () =>
+      import(/* webpackChunkName: "Circle" */ "@/views/Circle/Index.vue"),
+  },
+  {
+    path: "/notFound",
+    name: "NotFound",
     meta: {
-      title: 'Page not found',
-      isLogin: false
+      title: "Page not found",
+      isLogin: false,
     },
-    component: () => import(/* webpackChunkName: "NotFound" */ '@/components/NotFound/Index.vue')
+    component: () =>
+      import(
+        /* webpackChunkName: "NotFound" */ "@/components/NotFound/Index.vue"
+      ),
   },
   // 所有未定义路由，全部重定向到notFound页
   {
-    path: '*',
-    redirect: '/notFound'
-  }
+    path: "*",
+    redirect: "/notFound",
+  },
 ];
 
 const router = new VueRouter({
