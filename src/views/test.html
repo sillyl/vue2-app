@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<body>
+<canvas id="myCanvas" width="400" height="400" style="border:1px solid #000000;"></canvas>
+ 
+<script>
+var canvas = document.getElementById('myCanvas');
+var ctx = canvas.getContext('2d');
+var centerX = canvas.width / 2;
+var centerY = canvas.height / 2;
+var radiusX = 150; // 椭圆的水平半径
+var radiusY = 100; // 椭圆的垂直半径
+var angle = 0; // 初始角度
+ 
+function drawEllipse() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height); // 清除画布
+ 
+  // 绘制椭圆
+  ctx.beginPath();
+  ctx.ellipse(centerX, centerY, radiusX, radiusY, 0, 0, Math.PI * 2);
+  ctx.stroke();
+ 
+  // 计算旋转点的位置
+  var x = centerX + radiusX * Math.cos(angle);
+  var y = centerY + radiusY * Math.sin(angle);
+ 
+  // 绘制旋转的点
+  ctx.beginPath();
+  ctx.arc(x, y, 5, 0, Math.PI * 2);
+  ctx.fill();
+ 
+  angle += 0.01; // 增加角度
+}
+ 
+setInterval(drawEllipse, 10); // 每10毫秒调用一次drawEllipse函数
+</script>
+ 
+</body>
+</html>
