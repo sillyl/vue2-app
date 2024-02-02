@@ -2124,6 +2124,11 @@ ansi-styles@^4.0.0, ansi-styles@^4.1.0:
   dependencies:
     color-convert "^2.0.1"
 
+ansi_up@^6.0.2:
+  version "6.0.2"
+  resolved "https://registry.npmmirror.com/ansi_up/-/ansi_up-6.0.2.tgz#083adb65be5b21ba283fd105d3102e64f3f0b092"
+  integrity sha512-3G3vKvl1ilEp7J1u6BmULpMA0xVoW/f4Ekqhl8RTrJrhEBkonKn5k3bUc5Xt+qDayA6iDX0jyUh3AbZjB/l0tw==
+
 any-promise@^1.0.0:
   version "1.3.0"
   resolved "https://registry.npmmirror.com/any-promise/-/any-promise-1.3.0.tgz#abc6afeedcea52e809cdc0376aed3ce39635d17f"
