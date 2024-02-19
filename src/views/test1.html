@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title></title>
+    <style></style>
+  </head>
+  <body>
+    <canvas id="myCanvas1" width="400" height="400"></canvas>
+  </body>
+</html>
+<script>
+  let canvas = document.querySelector("#myCanvas1");
+  var ctx = canvas.getContext("2d");
+
+  var centerX = canvas.width / 2;
+  var centerY = canvas.height / 2;
+  var R = 100;
+
+  var angle = 0; // 初始角度
+  var speed = 0.05; // 运动速度
+
+  function animate() {
+    requestAnimationFrame(animate);
+
+    // 计算圆心坐标
+    var x = centerX + Math.cos(angle) * R;
+    var y = centerY + Math.sin(angle) * R;
+
+    // 绘制圆
+    ctx.beginPath();
+    ctx.arc(x, y, 10, 0, 2 * Math.PI);
+    ctx.fillStyle = "red";
+    ctx.fill();
+
+    // 更新角度
+    angle += speed;
+  }
+  // 清除画布
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  animate();
+</script>
