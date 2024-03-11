@@ -5,6 +5,7 @@
     <el-input v-model="ansiString" placeholder="请输入内容"></el-input>
     <div v-html="ansi_up.ansi_to_html(this.ansiString)"></div>
     <!-- <VideoPlayer :src="videoUrl" :isShow="true" /> -->
+    <Test />
   </div>
 </template>
 
@@ -12,6 +13,7 @@
 import Konva from "@/components/Konva/Index.vue";
 import PgmKonva from "./PgmKonva/Index.vue";
 import VideoPlayer from "@/components/VideoPlayer/Index.vue";
+import Test from "./Test.vue";
 import { AnsiUp } from "ansi_up";
 // import VideoPlayer from "@/components/Wfs/Index.vue";
 
@@ -30,6 +32,7 @@ export default {
     // PgmKonva,
     // CesiumViewer,
     // VideoPlayer,
+    Test,
   },
   mounted() {},
   methods: {},
