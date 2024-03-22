@@ -24,12 +24,30 @@
         // 绘制外椭圆
         ctx.beginPath();
         ctx.ellipse(centerX, centerY, radiusX, radiusY, 0, 0, Math.PI * 2);
+        // // 设置阴影样式
+        ctx.strokeStyle = "rgba(0, 0, 0, 0.5)";
+        ctx.shadowColor = "rgba(0, 0, 0, 0.5)"; // 阴影颜色
+        ctx.shadowBlur = 0; // 阴影模糊度
+        ctx.shadowOffsetX = 0; // 阴影x轴偏移
+        ctx.shadowOffsetY = 15; // 阴影y轴偏移
         ctx.stroke();
-        ctx.closePath();
 
+        //  开始填充两个椭圆之间的空隙
+        ctx.beginPath();
+        // 移动到内椭圆的起始位置
+        ctx.moveTo(centerX + 130 * Math.cos(0), centerY + 80 * Math.sin(0));
+        // 绘制内椭圆的弧线
+        ctx.ellipse(centerX, centerY, 130, 80, 0, 0, Math.PI * 2, false);
+        // 绘制外椭圆的弧线，与内椭圆形成封闭路径
+        ctx.ellipse(centerX, centerY, radiusX, radiusY, 0, 0, Math.PI * 2, true);
+        // 填充空隙
+        ctx.fillStyle = "rgba(0, 0, 0, 0.4)"; // 设置你想要的填充颜色
+        ctx.fill();
+        ctx.closePath();
         // 绘制内椭圆
         ctx.beginPath();
         ctx.ellipse(centerX, centerY, 130, 80, 0, 0, Math.PI * 2);
+        // ctx.strokeStyle = "rgba(0, 0, 0, 0.5)";
         ctx.stroke();
         ctx.closePath();
 
@@ -50,11 +68,20 @@
       }
 
       function drawCircle(ctx, angle, canvas, x, y) {
+        console.log(
+          "x, y",x, y
+        );
         // 绘制旋转的点
         ctx.beginPath();
         ctx.arc(x, y, 10, 0, Math.PI * 2);
-        ctx.fillStyle = "green";
+        ctx.fillStyle = "#08c808";
+        ctx.shadowColor = "#08c808"; // 阴影颜色
+        ctx.shadowBlur = 0; // 阴影模糊度
+        ctx.shadowOffsetX = 0; // 阴影x轴偏移
+        ctx.shadowOffsetY = 15; // 阴影y轴偏移
         ctx.fill();
+        ctx.strokeStyle = "rgba(0, 0, 0, 0.1)";
+        ctx.stroke();
         ctx.closePath();
       }
       drawEllipse();

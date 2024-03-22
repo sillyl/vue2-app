@@ -2,10 +2,11 @@
   <div class="home">
     <!-- <Konva /> -->
     <!-- <PgmKonva /> -->
-    <el-input v-model="ansiString" placeholder="请输入内容"></el-input>
-    <div v-html="ansi_up.ansi_to_html(this.ansiString)"></div>
+    <!-- <el-input v-model="ansiString" placeholder="请输入内容"></el-input>
+    <div v-html="ansi_up.ansi_to_html(this.ansiString)"></div> -->
     <!-- <VideoPlayer :src="videoUrl" :isShow="true" /> -->
-    <Test />
+    <!-- <Test /> -->
+    <!-- <TestCircle /> -->
   </div>
 </template>
 
@@ -15,6 +16,7 @@ import PgmKonva from "./PgmKonva/Index.vue";
 import VideoPlayer from "@/components/VideoPlayer/Index.vue";
 import Test from "./Test.vue";
 import { AnsiUp } from "ansi_up";
+// import TestCircle from "../views/Three/TestCircle.vue";
 // import VideoPlayer from "@/components/Wfs/Index.vue";
 
 export default {
@@ -32,7 +34,8 @@ export default {
     // PgmKonva,
     // CesiumViewer,
     // VideoPlayer,
-    Test,
+    // Test,
+    TestCircle,
   },
   mounted() {},
   methods: {},
