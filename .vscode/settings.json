@@ -2,8 +2,8 @@
   //保存的时候自动格式化
   "editor.formatOnSave": true,
   "editor.codeActionsOnSave": {
-    "source.fixAll": true,
-    "source.fixAll.eslint": true,
+    "source.fixAll": "explicit",
+    "source.fixAll.eslint": "explicit"
   },
   "liveServer.settings.port": 5501,
 }
